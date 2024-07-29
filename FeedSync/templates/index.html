@@ -1,0 +1,363 @@
+{% extends "base.html" %}
+
+{% block start %}
+
+<aside id="default-sidebar"
+    class="fixed top-0 sm:top-24  left-0 z-40 w-48 h-screen transition-transform -translate-x-full sm:translate-x-0"
+    aria-label="Sidebar">
+    <div class="h-full px-3 py-4 overflow-y-auto bg-gray-50 dark:bg-gray-800">
+        <ul class="space-y-2 font-medium">
+            <li>
+                <a href="#"
+                    class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+                    <svg class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+                        aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 21">
+                        <path
+                            d="M16.975 11H10V4.025a1 1 0 0 0-1.066-.998 8.5 8.5 0 1 0 9.039 9.039.999.999 0 0 0-1-1.066h.002Z" />
+                        <path
+                            d="M12.5 0c-.157 0-.311.01-.565.027A1 1 0 0 0 11 1.02V10h8.975a1 1 0 0 0 1-.935c.013-.188.028-.374.028-.565A8.51 8.51 0 0 0 12.5 0Z" />
+                    </svg>
+                    <span class="ms-3">Dashboard</span>
+                </a>
+            </li>
+            <li>
+                <a href="#"
+                    class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+                    <svg class="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+                        aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 18 18">
+                        <path
+                            d="M6.143 0H1.857A1.857 1.857 0 0 0 0 1.857v4.286C0 7.169.831 8 1.857 8h4.286A1.857 1.857 0 0 0 8 6.143V1.857A1.857 1.857 0 0 0 6.143 0Zm10 0h-4.286A1.857 1.857 0 0 0 10 1.857v4.286C10 7.169 10.831 8 11.857 8h4.286A1.857 1.857 0 0 0 18 6.143V1.857A1.857 1.857 0 0 0 16.143 0Zm-10 10H1.857A1.857 1.857 0 0 0 0 11.857v4.286C0 17.169.831 18 1.857 18h4.286A1.857 1.857 0 0 0 8 16.143v-4.286A1.857 1.857 0 0 0 6.143 10Zm10 0h-4.286A1.857 1.857 0 0 0 10 11.857v4.286c0 1.026.831 1.857 1.857 1.857h4.286A1.857 1.857 0 0 0 18 16.143v-4.286A1.857 1.857 0 0 0 16.143 10Z" />
+                    </svg>
+                    <span class="flex-1 ms-3 whitespace-nowrap">Kanban</span>
+                    <span
+                        class="inline-flex items-center justify-center px-2 ms-3 text-sm font-medium text-gray-800 bg-gray-100 rounded-full dark:bg-gray-700 dark:text-gray-300">Pro</span>
+                </a>
+            </li>
+            <li>
+                <a href="#"
+                    class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+                    <svg class="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+                        aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                        <path
+                            d="m17.418 3.623-.018-.008a6.713 6.713 0 0 0-2.4-.569V2h1a1 1 0 1 0 0-2h-2a1 1 0 0 0-1 1v2H9.89A6.977 6.977 0 0 1 12 8v5h-2V8A5 5 0 1 0 0 8v6a1 1 0 0 0 1 1h8v4a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-4h6a1 1 0 0 0 1-1V8a5 5 0 0 0-2.582-4.377ZM6 12H4a1 1 0 0 1 0-2h2a1 1 0 0 1 0 2Z" />
+                    </svg>
+                    <span class="flex-1 ms-3 whitespace-nowrap">Inbox</span>
+                    <span
+                        class="inline-flex items-center justify-center w-3 h-3 p-3 ms-3 text-sm font-medium text-blue-800 bg-blue-100 rounded-full dark:bg-blue-900 dark:text-blue-300">3</span>
+                </a>
+            </li>
+            <li>
+                <a href="#"
+                    class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+                    <svg class="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+                        aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 18">
+                        <path
+                            d="M14 2a3.963 3.963 0 0 0-1.4.267 6.439 6.439 0 0 1-1.331 6.638A4 4 0 1 0 14 2Zm1 9h-1.264A6.957 6.957 0 0 1 15 15v2a2.97 2.97 0 0 1-.184 1H19a1 1 0 0 0 1-1v-1a5.006 5.006 0 0 0-5-5ZM6.5 9a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9ZM8 10H5a5.006 5.006 0 0 0-5 5v2a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-2a5.006 5.006 0 0 0-5-5Z" />
+                    </svg>
+                    <span class="flex-1 ms-3 whitespace-nowrap">Users</span>
+                </a>
+            </li>
+            <li>
+                <a href="#"
+                    class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+                    <svg class="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+                        aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 18 20">
+                        <path
+                            d="M17 5.923A1 1 0 0 0 16 5h-3V4a4 4 0 1 0-8 0v1H2a1 1 0 0 0-1 .923L.086 17.846A2 2 0 0 0 2.08 20h13.84a2 2 0 0 0 1.994-2.153L17 5.923ZM7 9a1 1 0 0 1-2 0V7h2v2Zm0-5a2 2 0 1 1 4 0v1H7V4Zm6 5a1 1 0 1 1-2 0V7h2v2Z" />
+                    </svg>
+                    <span class="flex-1 ms-3 whitespace-nowrap">Products</span>
+                </a>
+            </li>
+            <li>
+                <a href="#"
+                    class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+                    <svg class="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+                        aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 16">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M1 8h11m0 0L8 4m4 4-4 4m4-11h3a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-3" />
+                    </svg>
+                    <span class="flex-1 ms-3 whitespace-nowrap">Sign In</span>
+                </a>
+            </li>
+            <li>
+                <a href="#"
+                    class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+                    <svg class="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+                        aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M5 5V.13a2.96 2.96 0 0 0-1.293.749L.879 3.707A2.96 2.96 0 0 0 .13 5H5Z" />
+                        <path
+                            d="M6.737 11.061a2.961 2.961 0 0 1 .81-1.515l6.117-6.116A4.839 4.839 0 0 1 16 2.141V2a1.97 1.97 0 0 0-1.933-2H7v5a2 2 0 0 1-2 2H0v11a1.969 1.969 0 0 0 1.933 2h12.134A1.97 1.97 0 0 0 16 18v-3.093l-1.546 1.546c-.413.413-.94.695-1.513.81l-3.4.679a2.947 2.947 0 0 1-1.85-.227 2.96 2.96 0 0 1-1.635-3.257l.681-3.397Z" />
+                        <path
+                            d="M8.961 16a.93.93 0 0 0 .189-.019l3.4-.679a.961.961 0 0 0 .49-.263l6.118-6.117a2.884 2.884 0 0 0-4.079-4.078l-6.117 6.117a.96.96 0 0 0-.263.491l-.679 3.4A.961.961 0 0 0 8.961 16Zm7.477-9.8a.958.958 0 0 1 .68-.281.961.961 0 0 1 .682 1.644l-.315.315-1.36-1.36.313-.318Zm-5.911 5.911 4.236-4.236 1.359 1.359-4.236 4.237-1.7.339.341-1.699Z" />
+                    </svg>
+                    <span class="flex-1 ms-3 whitespace-nowrap">Sign Up</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+</aside>
+
+<aside id="default-sidebar"
+    class="hidden lg:block fixed top-0 sm:top-52 right-0 w-64 h-screen transition-transform -translate-x-full sm:translate-x-0"
+    aria-label="Sidebar">
+    <div class="h-full px-3 py-4 overflow-y-auto bg-gray-50 dark:bg-gray-800">
+        <ul class="space-y-2 font-medium">
+            <li>
+                <a href="#"
+                    class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+                    <svg class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+                        aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 21">
+                        <path
+                            d="M16.975 11H10V4.025a1 1 0 0 0-1.066-.998 8.5 8.5 0 1 0 9.039 9.039.999.999 0 0 0-1-1.066h.002Z" />
+                        <path
+                            d="M12.5 0c-.157 0-.311.01-.565.027A1 1 0 0 0 11 1.02V10h8.975a1 1 0 0 0 1-.935c.013-.188.028-.374.028-.565A8.51 8.51 0 0 0 12.5 0Z" />
+                    </svg>
+                    <span class="ms-3">Contacts</span>
+                </a>
+            </li>
+
+
+
+        </ul>
+    </div>
+</aside>
+
+
+
+
+
+
+
+<div class="w-full grid grid-cols-12 justify-center">
+    <div class="col-span-3 sm:col-span-3 lg:col-span-2">Red</div>
+
+
+    <!-- sub box -->
+    <div class="col-span-12 sm:col-span-9 lg:col-span-7">
+
+        <div class="mt-20  mx-2 flex flex-col bg-white p-2">
+
+            <h1 class="text-center font-bold text-lg mt-1">Create Post</h1>
+            {% if profile_image_url %}
+            <img src="{{ profile_image_url }}" alt="Hi" class="rounded-full h-12 w-12 mb-1 object-cover">
+            {% else %}
+            <svg class="w-8 h-8 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                fill="currentColor" viewBox="0 0 20 20">
+                <path
+                    d="M10 0a10 10 0 1 0 10 10A10.011 10.011 0 0 0 10 0Zm0 5a3 3 0 1 1 0 6 3 3 0 0 1 0-6Zm0 13a8.949 8.949 0 0 1-4.951-1.488A3.987 3.987 0 0 1 9 13h2a3.987 3.987 0 0 1 3.951 3.512A8.949 8.949 0 0 1 10 18Z" />
+            </svg>
+
+            {% endif %}
+
+
+            <!-- post form -->
+            <div class="rounded-lg">
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <textarea name="caption" placeholder="What's on your mind?"
+                        class="w-full outline-none p-3 py-5 border-none" id="post" required></textarea>
+
+                    {% if messages %}
+                    <div class="p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-lg" role="alert">
+                        {% for message in messages %}
+                        <div>{{ message }}</div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <div class="flex flex-col justify-center items-center">
+                        <svg class="mx-auto h-12 w-12 text-gray-300" viewBox="0 0 24 24" fill="currentColor"
+                            aria-hidden="true">
+                            <path fill-rule="evenodd"
+                                d="M1.5 6a2.25 2.25 0 012.25-2.25h16.5A2.25 2.25 0 0122.5 6v12a2.25 2.25 0 01-2.25 2.25H3.75A2.25 2.25 0 011.5 18V6zM3 16.06V18c0 .414.336.75.75.75h16.5A.75.75 0 0021 18v-1.94l-2.69-2.689a1.5 1.5 0 00-2.12 0l-.88.879.97.97a.75.75 0 11-1.06 1.06l-5.16-5.159a1.5 1.5 0 00-2.12 0L3 16.061zm10.125-7.81a1.125 1.125 0 112.25 0 1.125 1.125 0 01-2.25 0z"
+                                clip-rule="evenodd" />
+                        </svg>
+                        <div class="mt-4 flex text-sm leading-6 text-gray-600">
+                            <label for="file-upload"
+                                class="cursor-pointer rounded-md bg-white font-semibold text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 hover:text-indigo-500">
+                                <span>Photo/Video</span>
+                                <input id="file-upload" name="image" type="file" class="sr-only">
+                            </label>
+                        </div>
+                    </div>
+                    <button type="submit"
+                        class="w-full mx-1 rounded-lg bg-blue-300 hover:bg-blue-600 font-semibold text-white text-center p-1 mt-2"
+                        id="post_submit">Post</button>
+                </form>
+            </div>
+            <!-- post form -->
+
+        </div>
+
+
+        {% if posts %}
+        {% for post in posts %}
+        <div class="mx-2 my-5 bg-white rounded-lg hover:cursor-pointer">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center p-2">
+                    {% if profile_image_url %}
+                    <img src="{{ profile_image_url }}" alt="Hi" class="rounded-full border h-12 w-12 mb-1 object-cover">
+                    {% else %}
+                    <svg class="w-8 h-8 text-gray-500 dark:text-gray-400" aria-hidden="true"
+                        xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                        <path
+                            d="M10 0a10 10 0 1 0 10 10A10.011 10.011 0 0 0 10 0Zm0 5a3 3 0 1 1 0 6 3 3 0 0 1 0-6Zm0 13a8.949 8.949 0 0 1-4.951-1.488A3.987 3.987 0 0 1 9 13h2a3.987 3.987 0 0 1 3.951 3.512A8.949 8.949 0 0 1 10 18Z" />
+                    </svg>
+
+                    {% endif %}
+                    <h1 class="ms-2 font-semibold text-lg">{{request.user.username}}</h1>
+                </div>
+                <div class="relative inline-block text-left">
+                    <div>
+                        <button type="button" id="dropdownButton-{{ forloop.counter }}"
+                            class="flex items-center justify-center w-full p-2 text-gray-500 hover:text-gray-700 focus:outline-none">
+                            <i class="fa-solid fa-ellipsis-vertical text-lg"></i>
+                        </button>
+                    </div>
+                    <div id="dropdownMenu-{{ forloop.counter }}"
+                        class="hidden absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+                        <div class="py-1" role="menu" aria-orientation="vertical"
+                            aria-labelledby="dropdownButton-{{ forloop.counter }}">
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                role="menuitem">Share</a>
+                            <a href="/edit/{{post.id}}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                role="menuitem">Edit</a>
+                            <a href="/delete/{{post.id}}"
+                                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                role="menuitem">Delete</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="flex flex-col">
+                <p class="text-base mt-1 p-3">{{ post.caption }}</p>
+                {% if post.image_url %}
+                <img src="{{ post.image_url }}" alt="Post Image" class="mt-1 w-full object-cover">
+
+                <div class="flex flex-col my-2">
+
+                    <div class="flex justify-around items-center ">
+                        <div class="px-2 py-0.5 flex gap-2 items-center font-semibold hover:bg-zinc-200"><i
+                                class="fa-regular fa-thumbs-up text-2xl  text-gray-500"></i>Like</div>
+                        <div class="px-2 py-0.5 flex gap-2 items-center font-semibold hover:bg-zinc-200"><i
+                                class="fa-regular fa-comment text-2xl text-gray-500"></i>Comment</div>
+                        <div class="px-2 py-0.5 flex gap-2 items-center font-semibold hover:bg-zinc-200"><i
+                                class="fa-solid fa-share text-2xl text-gray-500"></i>Share</div>
+                    </div>
+
+
+                    <div class="flex gap-1">
+                        {% if not request.user.is_authenticated %}
+                        {% if profile_image_url %}
+                        <img src="{{ profile_image_url }}" alt="Hi"
+                            class="rounded-full border h-12 w-12 mb-1 object-cover">
+                        {% else %}
+                        <svg class="w-8 h-8 text-gray-500 dark:text-gray-400" aria-hidden="true"
+                            xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                            <path
+                                d="M10 0a10 10 0 1 0 10 10A10.011 10.011 0 0 0 10 0Zm0 5a3 3 0 1 1 0 6 3 3 0 0 1 0-6Zm0 13a8.949 8.949 0 0 1-4.951-1.488A3.987 3.987 0 0 1 9 13h2a3.987 3.987 0 0 1 3.951 3.512A8.949 8.949 0 0 1 10 18Z" />
+                        </svg>
+
+                        {% endif %}
+
+           
+                        <form  method="POST" enctype="multipart/form-data"
+                            class="w-full bg-zinc-100 outline-none rounded-b-xl m-2 flex flex-col"
+                            action="{% url 'add_comment' post.id %}"
+                            >
+                            {% csrf_token %}
+
+                            <textarea  name="comment_text" placeholder="Write a comment"
+                                class="w-full p-2 bg-zinc-100 outline-none rounded-b-xl"></textarea>
+                            <button class="flex justify-end px-6 py-0.5"><i
+                                    class="fa-solid fa-arrow-right text-xl"></i></button>
+
+                        </form>
+                        {% else %}
+
+                        <!-- comment box -->
+                        
+                        <div class="flex flex-col my-3 mx-5 h-44 w-full">
+                            {% for reaction in post.reactions.all %}
+                                {% if reaction.reaction_type == "comment" %}
+
+                                    <div class="comment my-3 border w-full overfl">  
+                                        <div class="flex items-center gap-x-1">
+                                            {% if profile_image_url %}
+                                            <img src="{{ profile_image_url }}" alt="Hi"
+                                                class="rounded-full border h-10 w-10 mb-1 object-cover">
+                                            {% else %}
+                                            <svg class="w-8 h-8 text-gray-500 dark:text-gray-400" aria-hidden="true"
+                                                xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                                                <path
+                                                    d="M10 0a10 10 0 1 0 10 10A10.011 10.011 0 0 0 10 0Zm0 5a3 3 0 1 1 0 6 3 3 0 0 1 0-6Zm0 13a8.949 8.949 0 0 1-4.951-1.488A3.987 3.987 0 0 1 9 13h2a3.987 3.987 0 0 1 3.951 3.512A8.949 8.949 0 0 1 10 18Z" />
+                                            </svg>
+                    
+                                            {% endif %}
+                                            <h1 class="font-semibold text-xl">{{ reaction.user.username }}</h1>
+                                        </div>
+                                      <div class="bg-zinc-100 rounded-lg flex w-full p-1 justify-start">
+                                        <p class="ms-8">{{reaction.comment_text}}</p>
+                                    </div>
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+
+
+                </div>
+
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <h3 class="">No Posts Found</h3>
+        {% endif %}
+
+    </div>
+
+
+</div>
+
+<!-- sub box -->
+
+<script>
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const dropdownButtons = document.querySelectorAll('[id^="dropdownButton-"]');
+        dropdownButtons.forEach(button => {
+            button.addEventListener('click', function (event) {
+                const menuId = this.id.replace('Button', 'Menu');
+                const dropdownMenu = document.getElementById(menuId);
+                dropdownMenu.classList.toggle('hidden');
+
+                // Close the dropdown if the user clicks outside of it
+                document.addEventListener('click', function (event) {
+                    const isClickInside = button.contains(event.target) || dropdownMenu.contains(event.target);
+                    if (!isClickInside) {
+                        dropdownMenu.classList.add('hidden');
+                    }
+                });
+            });
+        });
+    });
+
+
+    const textarea = document.getElementById('post');
+    const submitButton = document.getElementById('post_submit');
+
+    textarea.addEventListener('input', () => {
+        if (textarea.value.trim().length > 0) {
+            submitButton.classList.remove('bg-blue-300');
+            submitButton.classList.add('bg-blue-600');
+        } else {
+            submitButton.classList.remove('bg-blue-600');
+            submitButton.classList.add('bg-blue-300');
+        }
+    });
+
+</script>
+{% endblock %}

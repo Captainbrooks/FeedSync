@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>FeedSync</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/flowbite@1.5.3/dist/flowbite.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<style>
+    body {
+        background-color: rgb(240, 243, 244);
+    }
+</style>
+
+<body>
+
+    <nav class="fixed top-0 left-0 w-full border-gray-200 bg-gray-50 dark:bg-gray-800 dark:border-gray-700">
+
+
+        <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-2">
+            <a href="/" class="flex  items-center space-x-3 rtl:space-x-reverse">
+                <img src="../static/images/feedsync.png" class="h-8 rounded-full" alt="FeedSync Logo" />
+                <span class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">FeedSync</span>
+                <button data-drawer-target="default-sidebar" data-drawer-toggle="default-sidebar"
+                    aria-controls="default-sidebar" type="button"
+                    class="inline-flex items-center p-2 mt-2 ms-3 text-sm text-gray-500 rounded-lg sm:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600 border">
+                    <span class="sr-only">Open sidebar</span>
+                    <svg class="w-6 h-6" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path clip-rule="evenodd" fill-rule="evenodd"
+                            d="M2 4.75A.75.75 0 012.75 4h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 4.75zm0 10.5a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5h-7.5a.75.75 0 01-.75-.75zM2 10a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 10z">
+                        </path>
+                    </svg>
+                </button>
+            </a>
+
+            <button id="navbar-toggle" type="button"
+                class="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
+                aria-controls="navbar-menu" aria-expanded="false">
+                <span class="sr-only">Open main menu</span>
+                <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
+                    viewBox="0 0 17 14">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M1 1h15M1 7h15M1 13h15" />
+                </svg>
+            </button>
+            <div class="hidden w-full md:block md:w-auto" id="navbar-menu">
+                <ul
+                    class="flex flex-col font-medium mt-4 rounded-lg bg-gray-50 md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 md:bg-transparent dark:bg-gray-800 md:dark:bg-transparent dark:border-gray-700">
+                    <li>
+
+                        <form class="bg-gray-100 rounded-full flex items-center shadow-sm">
+                            <input type="search" name="search" placeholder="Search..."
+                                class="flex-grow text-gray-700 bg-gray-100 rounded-l-full border-none focus:outline-none px-4">
+                            <button type="submit"
+                                class="px-3 py-3 bg-gray-100 rounded-r-full hover:bg-zinc-200 focus:outline-none focus-within:bg-white">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-600"
+                                    fill="currentColor" viewBox="0 0 50 50">
+                                    <path
+                                        d="M 21 3 C 11.621094 3 4 10.621094 4 20 C 4 29.378906 11.621094 37 21 37 C 24.710938 37 28.140625 35.804688 30.9375 33.78125 L 44.09375 46.90625 L 46.90625 44.09375 L 33.90625 31.0625 C 36.460938 28.085938 38 24.222656 38 20 C 38 10.621094 30.378906 3 21 3 Z M 21 5 C 29.296875 5 36 11.703125 36 20 C 36 28.296875 29.296875 35 21 35 C 12.703125 35 6 28.296875 6 20 C 6 11.703125 12.703125 5 21 5 Z">
+                                    </path>
+                                </svg>
+                            </button>
+                        </form>
+
+                    </li>
+
+                    <li>
+                        <a href="/messenger"
+                            class="block py-2 px-3 md:p-0 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">
+                            <i class="fa-brands fa-facebook-messenger text-2xl text-blue-600"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/friends"
+                            class="block py-2 px-3 md:p-0 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">
+                            <i class="fa-solid fa-user-group text-2xl text-blue-600"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/profile" data-popover-target="popover-bottom" data-popover-placement="bottom" type="button"
+                            class="block py-2 px-3 md:p-0 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white">
+                            {% if profile_image_url %}
+                            <img src="{{ profile_image_url }}" alt="Hi" class="rounded-full border h-12 w-12 mb-1 object-cover">
+                            {% else %}
+                            <svg class="w-8 h-8 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M10 0a10 10 0 1 0 10 10A10.011 10.011 0 0 0 10 0Zm0 5a3 3 0 1 1 0 6 3 3 0 0 1 0-6Zm0 13a8.949 8.949 0 0 1-4.951-1.488A3.987 3.987 0 0 1 9 13h2a3.987 3.987 0 0 1 3.951 3.512A8.949 8.949 0 0 1 10 18Z"/>
+                            </svg> 
+                            {% endif %}
+                        </a>
+
+                    
+<div data-popover id="popover-bottom" role="tooltip" class="absolute z-10 invisible inline-block w-64 text-sm text-gray-500 transition-opacity duration-300 bg-white border border-gray-200 rounded-lg shadow-sm opacity-0 dark:text-gray-400 dark:border-gray-600 dark:bg-gray-800">
+    <div class="px-3 py-2 bg-gray-100 border-b border-gray-200 rounded-t-lg dark:border-gray-600 dark:bg-gray-700">
+        <h3 class="font-semibold text-gray-900 dark:text-white">{{request.user.username}}</h3>
+    </div>
+    <div class="px-3 py-2">
+        <div class="px-3 py-2 bg-white">
+            <div class="col-span-full">
+               <a href="/logout"> <button type="button"
+                    class="text-white bg-gradient-to-r from-red-400 via-red-500 to-red-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2 w-full">Logout</button></a>
+            </div>
+        </div>
+    </div>
+    <div data-popper-arrow></div>
+</div>
+
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    {% block start %}
+
+
+
+    {% endblock %}
+
+    <script>
+        document.getElementById('navbar-toggle').addEventListener('click', function () {
+            var menu = document.getElementById('navbar-menu');
+            if (menu.classList.contains('hidden')) {
+                menu.classList.remove('hidden');
+            } else {
+                menu.classList.add('hidden');
+            }
+        });
+
+
+
+        
+        
+
+
+        
+
+
+
+
+
+    </script>
+
+</body>
+
+</html>
+
+
+
+
+
+<!-- Feed Sync
+
+
+
+
+- A simple UI, 
+
+in the Navbar, a FeedSync Title in the left side of the screen and a search field from where a user can search the friends.. and on the right side 
+a profile section...
+
+in between, there should be feed, friend request
+
+In the feed the user should be able to, either post a Caption
+or No captain is also accepted,
+
+a user should be able to post a image..
+
+and a user should be able to atleast edit the post for eg, either edit the post or delete basically CRUD. and share to (optional)
+
+
+a user should be able to message their friends,
+
+and a user should be able to find friends based on their friends name..
+
+and able to send friend req and the other user has the option either to accept the req and delete
+
+
+- a user feed should be about the own post and post of the friends they are with..
+
+
+- For foremost application starts with login page, if the user is not register , they will register first..
+
+If the user doesn't have any post then the create Post will show up otherwise.
+
+
+
+
+
+
+ -->
