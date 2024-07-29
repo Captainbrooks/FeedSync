@@ -3,7 +3,7 @@
 {% block start %}
 
 <aside id="default-sidebar"
-    class="fixed top-0 sm:top-24  left-0 z-40 w-48 h-screen transition-transform -translate-x-full sm:translate-x-0"
+    class="fixed top-0 sm:top-24  left-0 z-40 w-48 lg:w-72 h-screen transition-transform -translate-x-full sm:translate-x-0"
     aria-label="Sidebar">
     <div class="h-full px-3 py-4 overflow-y-auto bg-gray-50 dark:bg-gray-800">
         <ul class="space-y-2 font-medium">
@@ -98,7 +98,7 @@
 </aside>
 
 <aside id="default-sidebar"
-    class="hidden lg:block fixed top-0 sm:top-52 right-0 w-64 h-screen transition-transform -translate-x-full sm:translate-x-0"
+    class="hidden lg:block fixed top-0 sm:top-52 right-0 w-64 lg:w-80 h-screen transition-transform -translate-x-full sm:translate-x-0"
     aria-label="Sidebar">
     <div class="h-full px-3 py-4 overflow-y-auto bg-gray-50 dark:bg-gray-800">
         <ul class="space-y-2 font-medium">
@@ -135,7 +135,7 @@
     <!-- sub box -->
     <div class="col-span-12 sm:col-span-9 lg:col-span-7">
 
-        <div class="mt-20  mx-2 flex flex-col bg-white p-2">
+        <div class="mt-20  lg:mx-28 lg:mr-10  flex flex-col bg-white p-2">
 
             <h1 class="text-center font-bold text-lg mt-1">Create Post</h1>
             {% if profile_image_url %}
@@ -157,13 +157,15 @@
                     <textarea name="caption" placeholder="What's on your mind?"
                         class="w-full outline-none p-3 py-5 border-none" id="post" required></textarea>
 
-                    {% if messages %}
-                    <div class="p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-lg" role="alert">
+                
+                {% if messages %}
+                    
                         {% for message in messages %}
                         <div>{{ message }}</div>
                         {% endfor %}
-                    </div>
-                    {% endif %}
+                        {% endif %}
+               
+
 
                     <div class="flex flex-col justify-center items-center">
                         <svg class="mx-auto h-12 w-12 text-gray-300" viewBox="0 0 24 24" fill="currentColor"
@@ -192,7 +194,7 @@
 
         {% if posts %}
         {% for post in posts %}
-        <div class="mx-2 my-5 bg-white rounded-lg hover:cursor-pointer">
+        <div class="mx-2 lg:mx-28 lg:mr-10 my-5 bg-white rounded-lg hover:cursor-pointer">
             <div class="flex justify-between items-center">
                 <div class="flex items-center p-2">
                     {% if profile_image_url %}
@@ -229,28 +231,63 @@
                     </div>
                 </div>
             </div>
+            <!-- post content -->
             <div class="flex flex-col">
                 <p class="text-base mt-1 p-3">{{ post.caption }}</p>
                 {% if post.image_url %}
-                <img src="{{ post.image_url }}" alt="Post Image" class="mt-1 w-full object-cover">
+                <img src="{{ post.image_url }}" alt="Post Image" class="mt-1 mb-5 w-full object-cover">
+
+
+                
+                {% if post.like_count > 0 or post.comment_count > 0 %}
+                <div class="flex justify-start ms-5 items-center gap-x-9">
+                    <span>{{ post.like_count }} <i class="fa-regular fa-thumbs-up text-blue-600"></i></span>
+                    <span>{{ post.comment_count }} <i class="fa-regular fa-comment text-gray-500"></i></span>
+                </div>
+            {% endif %}
+            
+
+                <hr class="h-px mb-5 bg-gray-200 border-0 dark:bg-gray-700">
 
                 <div class="flex flex-col my-2">
 
                     <div class="flex justify-around items-center ">
-                        <div class="px-2 py-0.5 flex gap-2 items-center font-semibold hover:bg-zinc-200"><i
-                                class="fa-regular fa-thumbs-up text-2xl  text-gray-500"></i>Like</div>
-                        <div class="px-2 py-0.5 flex gap-2 items-center font-semibold hover:bg-zinc-200"><i
-                                class="fa-regular fa-comment text-2xl text-gray-500"></i>Comment</div>
-                        <div class="px-2 py-0.5 flex gap-2 items-center font-semibold hover:bg-zinc-200"><i
-                                class="fa-solid fa-share text-2xl text-gray-500"></i>Share</div>
+                        <div class="px-2 py-0.5 flex gap-2 items-center font-semibold hover:bg-zinc-200">
+        
+
+                            </form method="POST"> 
+          
+                           <a href="{% url 'like_post' post.id %}" class="{% if post.user_has_liked %}text-blue-500{% else %}text-gray-500{% endif %}">
+                          
+                            
+                        
+                                
+                            <i class="fa-regular fa-thumbs-up text-2xl {% if post.user_has_liked %}text-blue-500{% else %}text-gray-500{% endif %}"></i>
+                            Like
+                           </a>
+                        </div>
+
+
+                    
+                        <div class="px-2 py-0.5 flex gap-2 items-center font-semibold hover:bg-zinc-200">
+                            <i class="fa-regular fa-comment text-2xl text-gray-500"></i>Comment
+                        </div>
+                        <div class="px-2 py-0.5 flex gap-2 items-center font-semibold hover:bg-zinc-200">
+                            <i class="fa-solid fa-share text-2xl text-gray-500"></i>Share
+                        </div>
                     </div>
 
+                    <!-- comment section -->
+                    <div class="flex flex-col gap-1 p-2">
 
-                    <div class="flex gap-1">
-                        {% if not request.user.is_authenticated %}
+
+
                         {% if profile_image_url %}
+                        <div class="flex items-center gap-x-2">
                         <img src="{{ profile_image_url }}" alt="Hi"
                             class="rounded-full border h-12 w-12 mb-1 object-cover">
+                            <h1 class="font-semibold text-lg">{{request.user.username}}</h1>
+                        </div>
                         {% else %}
                         <svg class="w-8 h-8 text-gray-500 dark:text-gray-400" aria-hidden="true"
                             xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
@@ -260,57 +297,131 @@
 
                         {% endif %}
 
-           
-                        <form  method="POST" enctype="multipart/form-data"
-                            class="w-full bg-zinc-100 outline-none rounded-b-xl m-2 flex flex-col"
-                            action="{% url 'add_comment' post.id %}"
-                            >
+                       
+
+
+
+
+                   
+
+                            {% for message in messages %}
+                            {% if 'add_comment' in message.tags %}
+                            <div id="toast-success" class="flex items-center w-full max-w-xs p-4 mb-4 text-gray-500 bg-white rounded-lg shadow dark:text-gray-400 dark:bg-gray-800" role="alert">
+                                <div class="inline-flex items-center justify-center flex-shrink-0 w-8 h-8 text-green-500 bg-green-100 rounded-lg dark:bg-green-800 dark:text-green-200">
+                                    <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 8.207-4 4a1 1 0 0 1-1.414 0l-2-2a1 1 0 0 1 1.414-1.414L9 10.586l3.293-3.293a1 1 0 0 1 1.414 1.414Z"/>
+                                    </svg>
+                                    <span class="sr-only">Check icon</span>
+                                </div>
+                                <div class="ms-3 text-sm font-normal">{{message}}</div>
+                                <button type="button" class="ms-auto -mx-1.5 -my-1.5 bg-white text-gray-400 hover:text-gray-900 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 hover:bg-gray-100 inline-flex items-center justify-center h-8 w-8 dark:text-gray-500 dark:hover:text-white dark:bg-gray-800 dark:hover:bg-gray-700" data-dismiss-target="#toast-success" aria-label="Close">
+                                    <span class="sr-only">Close</span>
+                                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                                    </svg>
+                                </button>
+                            </div>
+                           {% endif %}
+                            {% endfor %}
+                     
+                   
+
+                        <form method="POST" action="{% url 'add_comment' post.id %}" enctype="multipart/form-data"
+                            class="w-full bg-zinc-100 outline-none rounded-b-xl m-2 flex flex-col" action="">
                             {% csrf_token %}
 
-                            <textarea  name="comment_text" placeholder="Write a comment"
+                            <textarea name="comment_text" placeholder="Write a comment"
                                 class="w-full p-2 bg-zinc-100 outline-none rounded-b-xl"></textarea>
-                            <button class="flex justify-end px-6 py-0.5"><i
-                                    class="fa-solid fa-arrow-right text-xl"></i></button>
+                            <button  class=" flex bg-blue-600 font-bold text-white mx-auto px-6 py-0.5">Post Comment
+                            </button>
 
                         </form>
-                        {% else %}
+
 
                         <!-- comment box -->
-                        
-                        <div class="flex flex-col my-3 mx-5 h-44 w-full">
-                            {% for reaction in post.reactions.all %}
-                                {% if reaction.reaction_type == "comment" %}
 
-                                    <div class="comment my-3 border w-full overfl">  
-                                        <div class="flex items-center gap-x-1">
-                                            {% if profile_image_url %}
-                                            <img src="{{ profile_image_url }}" alt="Hi"
-                                                class="rounded-full border h-10 w-10 mb-1 object-cover">
-                                            {% else %}
-                                            <svg class="w-8 h-8 text-gray-500 dark:text-gray-400" aria-hidden="true"
-                                                xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-                                                <path
-                                                    d="M10 0a10 10 0 1 0 10 10A10.011 10.011 0 0 0 10 0Zm0 5a3 3 0 1 1 0 6 3 3 0 0 1 0-6Zm0 13a8.949 8.949 0 0 1-4.951-1.488A3.987 3.987 0 0 1 9 13h2a3.987 3.987 0 0 1 3.951 3.512A8.949 8.949 0 0 1 10 18Z" />
+
+                        {% for comment in post.comments %}
+                        <div class="flex flex-col my-3 mx-5">
+   
+
+                            <div class="comment my-3 border">
+                                
+                                <div class="flex items-center gap-x-1">
+                                    {% if profile_image_url %}
+                                    <img src="{{ profile_image_url }}" alt="Hi"
+                                        class="rounded-full border h-10 w-10 mb-1 object-cover">
+                                    {% else %}
+                                    <svg class="w-8 h-8 text-gray-500 dark:text-gray-400" aria-hidden="true"
+                                        xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                                        <path
+                                            d="M10 0a10 10 0 1 0 10 10A10.011 10.011 0 0 0 10 0Zm0 5a3 3 0 1 1 0 6 3 3 0 0 1 0-6Zm0 13a8.949 8.949 0 0 1-4.951-1.488A3.987 3.987 0 0 1 9 13h2a3.987 3.987 0 0 1 3.951 3.512A8.949 8.949 0 0 1 10 18Z" />
+                                    </svg>
+
+                                    {% endif %}
+                                    <h1 class="font-semibold text-xl">{{ comment.user.username }}</h1>
+                                </div>
+                                <div class="bg-zinc-100 rounded-lg flex flex-col w-full p-1 justify-start">
+                                    <p class="ms-8">{{comment.content}}</p>
+                              
+                                      
+                                </div>
+
+                                
+                                {% if request.user.is_authenticated and comment.user == request.user %}
+
+                                {% if messages %}
+         
+                                    {% for message in messages %}
+                                    {% if 'delete_comment' in message.tags %}
+
+                                    <div id="toast-danger" class="flex items-center w-full max-w-xs p-4 mb-4 text-gray-500 bg-white rounded-lg shadow dark:text-gray-400 dark:bg-gray-800" role="alert">
+                                        <div class="inline-flex items-center justify-center flex-shrink-0 w-8 h-8 text-red-500 bg-red-100 rounded-lg dark:bg-red-800 dark:text-red-200">
+                                            <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                                                <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 11.793a1 1 0 1 1-1.414 1.414L10 11.414l-2.293 2.293a1 1 0 0 1-1.414-1.414L8.586 10 6.293 7.707a1 1 0 0 1 1.414-1.414L10 8.586l2.293-2.293a1 1 0 0 1 1.414 1.414L11.414 10l2.293 2.293Z"/>
                                             </svg>
-                    
-                                            {% endif %}
-                                            <h1 class="font-semibold text-xl">{{ reaction.user.username }}</h1>
+                                            <span class="sr-only">Error icon</span>
                                         </div>
-                                      <div class="bg-zinc-100 rounded-lg flex w-full p-1 justify-start">
-                                        <p class="ms-8">{{reaction.comment_text}}</p>
+                                        <div class="ms-3 text-sm font-normal">Comment has been deleted.</div>
+                                        <button type="button" class="ms-auto -mx-1.5 -my-1.5 bg-white text-gray-400 hover:text-gray-900 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 hover:bg-gray-100 inline-flex items-center justify-center h-8 w-8 dark:text-gray-500 dark:hover:text-white dark:bg-gray-800 dark:hover:bg-gray-700" data-dismiss-target="#toast-danger" aria-label="Close">
+                                            <span class="sr-only">Close</span>
+                                            <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                                            </svg>
+                                        </button>
                                     </div>
-                                    </div>
+                                        {% endif %}
+                                    {% endfor %}
+                            
                                 {% endif %}
-                            {% endfor %}
+
+                                
+                                    
+                                <form action="{% url 'delete_comment' post.id comment.id %}" method="POST">
+                                    {% csrf_token %}
+                                    <button class="mx-5 w-full bg-red-500 font-bold py-1 my-1 text-white ">Delete</button>
+                                                                    </form>
+                                    
+                                {% endif %}
+                                    
+                            </div>
+
+                       
                         </div>
-                        {% endif %}
+                        {% endfor %}
+
+
                     </div>
+
+                    <!-- comment section end -->
 
 
                 </div>
 
                 {% endif %}
             </div>
+
+            <!-- post content -->
         </div>
         {% endfor %}
         {% else %}
@@ -356,6 +467,22 @@
         } else {
             submitButton.classList.remove('bg-blue-600');
             submitButton.classList.add('bg-blue-300');
+        }
+    });
+
+
+
+    window.addEventListener('beforeunload', () => {
+        sessionStorage.setItem('scrollPosition', window.scrollY);
+
+    });
+
+    window.addEventListener('load',()=>{
+
+    
+        const scrollPosition=sessionStorage.getItem('scrollPosition');
+        if(scrollPosition !==null){
+            window.scrollTo({top:parseInt(scrollPosition), behavior:'smooth'});
         }
     });
 

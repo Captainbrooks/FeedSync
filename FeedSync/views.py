@@ -1,7 +1,7 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect,get_object_or_404
 from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.decorators import login_required
-from .models import Posts, Profile, Reactions
+from .models import Posts, Profile,Like,Comment
 import base64
 from django.contrib import messages
 from django.contrib.auth.models import User
@@ -30,6 +30,13 @@ def index(request):
     
     print(all_posts)
     
+    liked_posts = Like.objects.filter(user=user).values_list('post_id', flat=True)
+    liked_posts_set = set(liked_posts)
+    
+    
+    
+    
+    
     
     
     image=Posts.objects.filter(user=user)
@@ -37,6 +44,12 @@ def index(request):
     for post in all_posts:
         if post.image:
             post.image_url = f"data:image/png;base64,{post.image}"
+        post.user_has_liked = post.id in liked_posts_set  
+        post.comments = Comment.objects.filter(post=post)
+        
+        post.like_count=post.get_like_count()
+        
+        post.comment_count=post.get_comment_count() 
             
             
             
@@ -193,28 +206,81 @@ def profile(request):
 
 
 
-@login_required(login_url="/login")
-def add_comment(request, post_id):
-    if request.method == "POST":
-        data=request.POST
-        print("comment is being added..")
-        print(post_id)
-        comment_text = data.get('comment_text')
+def like_post(request,post_id):
+    
+    
+    post=get_object_or_404(Posts, id=post_id)
+    
+    print(post_id)
+    
+    existing_like = Like.objects.filter(user=request.user, post=post).first()
+    
+    if existing_like:
+        # If like exists, remove it (unlike the post)
+        existing_like.delete()
+    else:
+        # Otherwise, create a new like
+        Like.objects.create(user=request.user, post=post)
+    
+    # Redirect to the post's detail page or another appropriate page
+    return redirect('/index', post_id=post_id)
+    
+    
+    
+
+
+
+
+
+
+def add_comment(request,post_id):
+    print("add comment")
+    post=get_object_or_404(Posts , id=post_id)
+    
+    if request.method=="POST":
+        print("reached")
+        comment_text = request.POST.get('comment_text')
         print(comment_text)
         if comment_text:
-            post = Posts.objects.get(id=post_id)
-            user = request.user
-            Reactions.objects.create(
-                user=user,
-                post=post,
-                reaction_type=Reactions.COMMENT,
-                comment_text=comment_text
-            )
-            print("Comment is added in the database")
-            messages.success(request, "Comment added successfully.")
+            Comment.objects.create(user=request.user, post=post, content=comment_text)
+            messages.success(request, "Comment Added successfully.", extra_tags="add_comment")
+            return redirect('/')
+        
         else:
-            messages.error(request, "Comment cannot be empty.")
+            messages.error(request,"COuldn't add a comment")
+            
+            
+            
+            
+            
+    return redirect('/')   
+
+
+
+
+
+def delete_comment(request,post_id,comment_id):
+    comment=get_object_or_404(Comment,id=comment_id,post_id=post_id,user=request.user)
+    
+    if request.method == "POST":
+        comment.delete()
+        messages.success(request, "Comment deleted successfully.", extra_tags="delete_comment")
+    else:
+        messages.error(request, "Invalid request method.")
+
     return redirect('/index')
+        
+            
+        
+        
+        
+        
+    
+    
+
+  
+    
+    
     
 
 
@@ -224,6 +290,22 @@ def add_comment(request, post_id):
 def logout_page(request):
     logout(request)
     return redirect('/login')
+
+
+
+  
+
+        
+        
+    
+
+    
+    
+    
+    return redirect('/index')
+    
+    
+
 
 
 

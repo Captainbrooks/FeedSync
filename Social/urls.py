@@ -27,7 +27,10 @@ urlpatterns = [
     path('messenger/',messenger,name="messenger"),
     path('profile/',profile,name="profile"),
     path('friends/',friends,name="friends"),
+    path('like/<int:post_id>/', like_post, name='like_post'),
+    path('post/<int:post_id>/add_comment/',add_comment, name='add_comment'),
+    path('post/<int:post_id>/<int:comment_id>/delete_comment',delete_comment, name='delete_comment'),
     path('logout/',logout_page,name="logout_page"),
-    path('add_comment/<int:post_id>/',add_comment, name='add_comment'),
+
     path('admin/', admin.site.urls),
 ]
