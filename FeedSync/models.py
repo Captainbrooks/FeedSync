@@ -80,18 +80,6 @@ class Friendship(models.Model):
     
     
     
-    
-    
-    
-    
-    
-
-
-
-    
-    
-    
-    
 
 
 
