@@ -6,6 +6,8 @@ import base64
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.http import JsonResponse
+from django.db.models import Q
+
 
 
 # Create your views here.
@@ -181,8 +183,9 @@ def messenger(request):
 def friends(request):
     user = request.user
     
-    receivedRequests = Friendship.objects.filter(receiver=user)
-    sentRequests = Friendship.objects.filter(sender=user)
+    receivedRequests = Friendship.objects.filter(receiver=user,accepted=False)
+    
+    sentRequests = Friendship.objects.filter(sender=user,accepted=False)
     
     received_reqs = []
     sent_reqs = []
@@ -422,9 +425,11 @@ def send_request(request,username):
     print(friend_req_receiver)
     
     
+
     
-    
-    existingfriendship=Friendship.objects.filter(sender=user,receiver=friend_req_receiver).exists()
+    existingfriendship=Friendship.objects.filter(
+        Q(sender=user, receiver=friend_req_receiver) |
+        Q(sender=friend_req_receiver, receiver=user)).exists()
     if not existingfriendship:
         
         Friendship.objects.create(
@@ -439,15 +444,56 @@ def send_request(request,username):
 
 
 
-def accept_friend_req(request,request_id):
-    friend_req=get_object_or_404(Friendship,id=request_id,receiver=request.user)
+def accept_request(request):
     
-    if not friend_req.accepted:
-        friend_req.accepted=True
-        friend_req.save()
+    print("accept request reached..")
+    
+    if request.method=="POST":
         
         
-    return redirect('/')
+        sender_name=request.POST.get('sender')
+        print(f"Sender:{sender_name}")
+        user=request.user
+        
+        
+        if sender_name:
+            friend_requests=Friendship.objects.filter(sender__username=sender_name,receiver=user)
+            print(friend_requests)
+            
+            
+            for req in friend_requests:
+                if not req.accepted:
+                    req.accepted = True
+                    req.save()
+            
+    
+
+  
+    
+    
+    # friend_requests = Friendship.objects.filter(receiver=user,sender=sender)
+    # print(friend_requests)
+    
+    # for r in friend_requests:
+    #     print(r.id)
+    
+    # for req in friend_requests:
+    #     print(f"Before: Request from {req.sender} to {req.receiver}, accepted: {req.accepted}")
+        
+    #     # Check if the request is not already accepted
+    #     if not req.accepted:
+    #         req.accepted = True
+    #         req.save()  # Save the change to the database
+    #         print(f"After: Request from {req.sender} to {req.receiver}, accepted: {req.accepted}")
+    
+    return redirect('/friends')
+        
+        
+    
+    
+        
+        
+    return redirect('/friends')
 
 
 

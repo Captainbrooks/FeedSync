@@ -1,51 +1,81 @@
 {% extends "base.html" %}
 
 {% block start %}
-<div class="mt-20">
-    <h1>Pending Requests</h1>
-    {% if received_reqs %}
-    <ul>
-        {% for r in received_reqs %}
-        <li>
-            <p>Sender: {{ r.sender }}</p>
-            {% if r.image %}
-            <div>
-                Image:
-                <img src="{{ r.image }}" class="w-10" alt="Pending Req User">
-            </div>
-            {% else %}
-            <div>No profile picture</div>
-            {% endif %}
-        </li>
-        {% endfor %}
-    </ul>
-    {% else %}
-    <p>No pending requests found.</p>
-    {% endif %}
+<div class="my-20  mx-auto max-w-screen-lg px-4">
 
-    <div>
-        ========================================
+    <section class="dark:bg-gray-900 rounded-lg overflow-hidden mb-2">
+        <div class="py-8 px-6 text-center">
+            <h1 class="mb-4 text-4xl font-extrabold tracking-tight leading-none text-gray-900 dark:text-white">Friends</h1>
+            <p class="text-lg font-normal text-gray-500 lg:text-xl dark:text-gray-400">Connect with your friends, manage your pending and sent requests easily.</p>
+        </div>
+    </section>
+
+    <div class="rounded-lg p-6 dark:bg-gray-800 mb-8">
+        <h1 class="text-2xl font-bold text-gray-800 dark:text-white mb-4">Pending Requests</h1>
+        {% if received_reqs %}
+        <ul class="space-y-4">
+            {% for r in received_reqs %}
+            <li class="flex items-center space-x-4 bg-gray-50 p-4 rounded-lg dark:bg-gray-700">
+                <div class="flex gap-x-5 items-center">
+    
+                    {% if r.image %}
+                    <img src="{{ r.image }}" class="w-16 h-16 rounded-full object-cover" alt="Pending Req User">
+                   
+                    {% else %}
+                    <div class="text-gray-500 dark:text-gray-300">No profile picture</div>
+                    {% endif %}
+                    <p class="text-lg font-semibold text-gray-700 dark:text-white">{{ r.sender }}</p>
+
+            
+                </div>
+                <div class="">
+
+           
+                  
+                    <form action="{% url 'accept_request' %}" method="POST">
+                        <input type="text" name="sender" class="hidden" value="{{r.sender}}">
+                        {% csrf_token %}
+                    <button type="submit" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Accept <i class="fa-solid fa-check"></i></button>
+                </form>
+
+                <form action="">
+                    <button type="button" class="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2 me-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900">Delete <i class="fa-solid fa-trash"></i> </button>
+                </form>
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p class="text-gray-500 dark:text-gray-300">No pending requests found.</p>
+        {% endif %}
     </div>
 
-    <h1>Sent Requests</h1>
-    {% if sent_reqs %}
-    <ul>
-        {% for r in sent_reqs %}
-        <li>
-            <p>Receiver: {{ r.receiver }}</p>
-            {% if r.image %}
-            <div>
-                Image:
-                <img src="{{ r.image }}" class="w-10" alt="Pending Req User">
-            </div>
-            {% else %}
-            <div>No profile picture</div>
-            {% endif %}
-        </li>
-        {% endfor %}
-    </ul>
-    {% else %}
-    <p>No sent requests found.</p>
-    {% endif %}
+    <div class="rounded-lg p-6 dark:bg-gray-800">
+        <h1 class="text-2xl font-bold text-gray-800 dark:text-white mb-4">Sent Requests</h1>
+        {% if sent_reqs %}
+        <ul class="space-y-4">
+            {% for r in sent_reqs %}
+            <li class="flex items-center space-x-4 bg-gray-50 p-4 rounded-lg dark:bg-gray-700">
+                <div class="flex gap-x-5 items-center">
+    
+                    {% if r.image %}
+                    <img src="{{ r.image }}" class="w-16 h-16 rounded-full object-cover" alt="Pending Req User">
+                    {% else %}
+                    <div class="text-gray-500 dark:text-gray-300">No profile picture</div>
+                    {% endif %}
+                    <p class="text-lg font-semibold text-gray-700 dark:text-white">{{ r.receiver }}</p>
+                </div>
+                <div>
+
+                    <button type="button" class="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2 me-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900">Cancel Request <i class="fa-solid fa-trash"></i> </button>
+                    <button type="button" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Message <i class="fa-solid fa-check"></i></button>
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p class="text-gray-500 dark:text-gray-300">No sent requests found.</p>
+        {% endif %}
+    </div>
 </div>
 {% endblock %}

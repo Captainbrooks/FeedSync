@@ -73,6 +73,10 @@ class Friendship(models.Model):
     created_at=models.DateTimeField(auto_now_add=True)
     accepted=models.BooleanField(default=False)
     
+    
+    class Meta:
+        unique_together = (('sender', 'receiver'), ('receiver', 'sender'))
+    
     def __str__(self):
         return f"{self.sender} -> {self.receiver} (Accepted: {self.accepted})"
     

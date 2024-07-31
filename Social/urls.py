@@ -33,7 +33,7 @@ urlpatterns = [
     path('search_friends/',search_friends,name="search_friends"),
     path('profile/<str:username>/',profile_url,name="profile_url"),
     path('send_request/<str:username>/', send_request, name='send_request'),
-    path('accept_request/<int:request_id>/', accept_friend_req, name='accept_friend_request'),
+    path('accept_request/', accept_request, name='accept_request'),
     path('reject_request/<int:request_id>/', reject_friend_request, name='reject_friend_request'),
     path('logout/',logout_page,name="logout_page"),
     path('admin/', admin.site.urls),
