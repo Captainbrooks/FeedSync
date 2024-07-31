@@ -30,7 +30,11 @@ urlpatterns = [
     path('like/<int:post_id>/', like_post, name='like_post'),
     path('post/<int:post_id>/add_comment/',add_comment, name='add_comment'),
     path('post/<int:post_id>/<int:comment_id>/delete_comment',delete_comment, name='delete_comment'),
+    path('search_friends/',search_friends,name="search_friends"),
+    path('profile/<str:username>/',profile_url,name="profile_url"),
+    path('send_request/<str:username>/', send_request, name='send_request'),
+    path('accept_request/<int:request_id>/', accept_friend_req, name='accept_friend_request'),
+    path('reject_request/<int:request_id>/', reject_friend_request, name='reject_friend_request'),
     path('logout/',logout_page,name="logout_page"),
-
     path('admin/', admin.site.urls),
 ]

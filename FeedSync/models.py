@@ -34,14 +34,13 @@ class Posts(models.Model):
     
 class Profile(models.Model):
     user=models.OneToOneField(User,on_delete=models.CASCADE)
+    cover_picture=models.TextField(User,null=True, blank=True)
     profile_picture=models.TextField(null=False,blank=True)
     
-    
-   
    
 class Like(models.Model):
     user=models.ForeignKey(User,on_delete=models.CASCADE)
-    post=models.ForeignKey(Posts,on_delete=models.CASCADE) 
+    post=models.ForeignKey(Posts,on_delete=models.CASCADE)
     
     
     class Meta:
@@ -65,6 +64,19 @@ class Comment(models.Model):
     
     def __str__(self):
         return f"{self.user.username} commented on {self.post.caption[:20]}: {self.content[:20]}"
+    
+    
+    
+class Friendship(models.Model):
+    sender=models.ForeignKey(User,related_name="sent_requests",on_delete=models.CASCADE)
+    receiver=models.ForeignKey(User,related_name="received_requests",on_delete=models.CASCADE)
+    created_at=models.DateTimeField(auto_now_add=True)
+    accepted=models.BooleanField(default=False)
+    
+    def __str__(self):
+        return f"{self.sender} -> {self.receiver} (Accepted: {self.accepted})"
+    
+    
     
     
     

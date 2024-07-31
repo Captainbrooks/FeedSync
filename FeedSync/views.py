@@ -1,10 +1,11 @@
-from django.shortcuts import render, redirect,get_object_or_404
+from django.shortcuts import render, redirect,get_object_or_404, HttpResponse
 from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.decorators import login_required
-from .models import Posts, Profile,Like,Comment
+from .models import Posts, Profile,Like,Comment, Friendship
 import base64
 from django.contrib import messages
 from django.contrib.auth.models import User
+from django.http import JsonResponse
 
 
 # Create your views here.
@@ -178,13 +179,93 @@ def messenger(request):
     return render(request, "messenger.html")
 
 def friends(request):
-    return render(request, "friends.html")
+    user = request.user
+    
+    receivedRequests = Friendship.objects.filter(receiver=user)
+    sentRequests = Friendship.objects.filter(sender=user)
+    
+    received_reqs = []
+    sent_reqs = []
+    
+    # Process received requests
+    for req in receivedRequests:
+        profile = Profile.objects.filter(user=req.sender).first()  # Use .first() to avoid multiple results
+        if profile:
+            received_reqs.append({
+                'sender': profile.user.username,
+                'image': base64_to_image(profile.profile_picture) if profile.profile_picture else None
+            })
+    
+    # Process sent requests
+    for req in sentRequests:
+        profile = Profile.objects.filter(user=req.receiver).first()  # Use .first() to avoid multiple results
+        if profile:
+            sent_reqs.append({
+                'receiver': profile.user.username,
+                'image': base64_to_image(profile.profile_picture) if profile.profile_picture else None
+            })
+    
+    # Always ensure context is defined before returning the response
+    context = {
+        'received_reqs': received_reqs,
+        'sent_reqs': sent_reqs
+    }
+    
+    return render(request, "friends.html", context)
+
+            
+        
+        
+    
+   
+    
+
+    
+    return render(request, "friends.html",context)
 
 
 def profile(request):
-    user = request.user
+    user=request.user
+    
+    all_posts=Posts.objects.filter(user=user)
+    
+    all_posts=Posts.objects.filter(user=user)
+    
+    print(all_posts)
+    
+    liked_posts = Like.objects.filter(user=user).values_list('post_id', flat=True)
+    liked_posts_set = set(liked_posts)
+    
+    
+    
+    
+    
+    
+    
+    image=Posts.objects.filter(user=user)
+    
+    for post in all_posts:
+        if post.image:
+            post.image_url = f"data:image/png;base64,{post.image}"
+        post.user_has_liked = post.id in liked_posts_set  
+        post.comments = Comment.objects.filter(post=post)
+        
+        post.like_count=post.get_like_count()
+        
+        post.comment_count=post.get_comment_count() 
+            
+            
+            
+    profile = Profile.objects.filter(user=user).first()
+    profile_image_url = base64_to_image(profile.profile_picture) if profile and profile.profile_picture else None  
+               
+    
+   
+  
+   
     
     if request.method == "POST":
+        print("reached..")
         file = request.FILES.get('profilepic')
         if file:
             profile_string = image_to_base64(file)
@@ -198,11 +279,8 @@ def profile(request):
     profile = Profile.objects.filter(user=user).first()
     profile_image_url = base64_to_image(profile.profile_picture) if profile and profile.profile_picture else None
     
-    context = {'profile_image_url': profile_image_url}
+    context = {'profile_image_url': profile_image_url,'posts':all_posts,'profile_image_url': profile_image_url}
     return render(request, "profile.html", context)
-
-
-
 
 
 
@@ -269,12 +347,147 @@ def delete_comment(request,post_id,comment_id):
         messages.error(request, "Invalid request method.")
 
     return redirect('/index')
+
+
+
+
+
+
+def search_friends(request):
+    user=request.user
+    query=request.GET.get('search','').strip()
+    
+    if not query:
+        messages.error(request, "Search query is empty.",extra_tags="search_friends_empty")
+    
+    
+    
+    matching_profiles = Profile.objects.filter(user__username__icontains=query)
+    
+    if not matching_profiles:
+            return JsonResponse({'results': [], 'message': f"Couldn't find any people with '{query}'"})
+    else:
+        results=[]
+        
+        for profile in matching_profiles:
+            profile_data={
+                'username':profile.user.username,
+                'profile_picture':base64_to_image(profile.profile_picture) if profile.profile_picture else None
+            }
+            results.append(profile_data)
+            
+    
+    
+    return JsonResponse({'results':results})
+
+
+
+
+
+def profile_url(request,username):
+    user=get_object_or_404(User,username=username)
+    
+    profile=get_object_or_404(Profile, user=user)
+    
+
+    
+    
+    profile_info={
+        'profile_name':profile.user.username,
+        'profile_image':base64_to_image(profile.profile_picture) if profile.profile_picture else None
+    }
+    
+    
+    context={'profile_info':profile_info}
+    
+
+    
+    
+    return render(request, "profile_url.html",context)
+
+
+
+
+
+
+
+
+def send_request(request,username):
+    print("send request reached..")
+    print(username)
+    user=request.user
+    friend_req_receiver=get_object_or_404(User,username=username)
+    
+    print(user)
+    print(friend_req_receiver)
+    
+    
+    
+    
+    existingfriendship=Friendship.objects.filter(sender=user,receiver=friend_req_receiver).exists()
+    if not existingfriendship:
+        
+        Friendship.objects.create(
+            sender=user,
+            receiver=friend_req_receiver,
+            accepted=False
+        )
+        
+        messages.info(request, "Friend Req Sent", extra_tags="req_sent")
+        
+    return redirect('/')
+
+
+
+def accept_friend_req(request,request_id):
+    friend_req=get_object_or_404(Friendship,id=request_id,receiver=request.user)
+    
+    if not friend_req.accepted:
+        friend_req.accepted=True
+        friend_req.save()
+        
+        
+    return redirect('/')
+
+
+
+
+def reject_friend_request(request, request_id):
+    friendship_request = get_object_or_404(Friendship, id=request_id, receiver=request.user)
+    
+    if not friendship_request.accepted:
+        friendship_request.delete()
+    
+    return redirect('friend_requests')
+    
+    
+        
+        
+    
+   
+    
+    
+    
+    
+    
+            
+            
+
+
+    
+
+        
+    
+    
+
+    
+    
         
             
         
         
         
-        
+ 
     
     
 

@@ -1,7 +1,51 @@
 {% extends "base.html" %}
 
 {% block start %}
+<div class="mt-20">
+    <h1>Pending Requests</h1>
+    {% if received_reqs %}
+    <ul>
+        {% for r in received_reqs %}
+        <li>
+            <p>Sender: {{ r.sender }}</p>
+            {% if r.image %}
+            <div>
+                Image:
+                <img src="{{ r.image }}" class="w-10" alt="Pending Req User">
+            </div>
+            {% else %}
+            <div>No profile picture</div>
+            {% endif %}
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>No pending requests found.</p>
+    {% endif %}
 
-<div>Friends</div>
+    <div>
+        ========================================
+    </div>
 
+    <h1>Sent Requests</h1>
+    {% if sent_reqs %}
+    <ul>
+        {% for r in sent_reqs %}
+        <li>
+            <p>Receiver: {{ r.receiver }}</p>
+            {% if r.image %}
+            <div>
+                Image:
+                <img src="{{ r.image }}" class="w-10" alt="Pending Req User">
+            </div>
+            {% else %}
+            <div>No profile picture</div>
+            {% endif %}
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>No sent requests found.</p>
+    {% endif %}
+</div>
 {% endblock %}
