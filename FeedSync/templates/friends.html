@@ -10,6 +10,54 @@
         </div>
     </section>
 
+
+    <div class="rounded-lg p-2 dark:bg-gray-800 mb-8">
+        <h1 class="text-2xl font-bold text-gray-800 dark:text-white mb-4">All Friends</h1>
+        {% if friends_with %}
+        <ul class="space-y-4">
+            {% for friend in friends_with %}
+            <li class="flex items-center space-x-4 bg-gray-50 p-4 rounded-lg dark:bg-gray-700">
+                <div class="flex gap-x-5 items-center">
+    
+                    {% if friend.image %}
+                    <img src="{{ friend.image }}" class="w-16 h-16 rounded-full object-cover" alt="Pending Req User">
+                   
+                    {% else %}
+                    <div class="text-gray-500 dark:text-gray-300">No profile picture</div>
+                    {% endif %}
+                    <p class="text-lg font-semibold text-gray-700 dark:text-white">{{ friend.name }}</p>
+
+            
+                </div>
+                <div class="">
+
+           
+                  
+                    <form action="{% url 'unfriend' %}" method="POST">
+                        <input type="text" name="unfriend" class="hidden" value="{{friend.name}}">
+                        {% csrf_token %}
+                        <button type="submit" class="flex gap-x-1 focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900">Unfriend
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                              </svg>     
+                        </button>
+                </form>
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p class="text-gray-500 dark:text-gray-300">You have no friends at the moment</p>
+        {% endif %}
+    </div>
+    
+
+
+
+
+
+
+
     <div class="rounded-lg p-6 dark:bg-gray-800 mb-8">
         <h1 class="text-2xl font-bold text-gray-800 dark:text-white mb-4">Pending Requests</h1>
         {% if received_reqs %}

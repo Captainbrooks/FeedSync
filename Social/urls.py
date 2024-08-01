@@ -36,6 +36,7 @@ urlpatterns = [
     path('accept_request/', accept_request, name='accept_request'),
     path('reject_request/', reject_request, name='reject_request'),
     path('cancel_request/', cancel_request, name='cancel_request'),
+    path('unfriend/', unfriend, name='unfriend'),
     path('logout/',logout_page,name="logout_page"),
     path('admin/', admin.site.urls),
 ]

@@ -24,7 +24,7 @@ def image_to_base64(image_path):
 def base64_to_image(base64_string):
    return f"data:image/png;base64,{base64_string}"
 
-
+@login_required(login_url="/login")
 def index(request):
     user = request.user
     
@@ -74,10 +74,26 @@ def index(request):
     profile = Profile.objects.filter(user=user).first()
     profile_image_url = base64_to_image(profile.profile_picture) if profile and profile.profile_picture else None
     
+    all_friends = Friendship.objects.filter(
+       accepted=True
+    )
+    
+ 
+    my_friends=[]
+    
+    for f in all_friends:
+        friend = f.sender if f.sender != user else f.receiver
+        profile = Profile.objects.filter(user=friend).first()
+        my_friends.append({
+            'name': friend.username,
+            'image': base64_to_image(profile.profile_picture) if profile.profile_picture else None
+        })
+    
     # Context for the template
     context = {
         'posts': all_posts,
-        'profile_image_url': profile_image_url
+        'profile_image_url': profile_image_url,
+        'my_friends':my_friends
     }
     
     
@@ -88,12 +104,12 @@ def index(request):
    
     
     if request.method == "POST":
-        print("Form is submiited ")
+      
         data=request.POST
         
         caption=data.get('caption')
         
-        print(caption)
+       
         
         trim_caption=caption.strip()
         
@@ -107,7 +123,7 @@ def index(request):
         else:
             pass  
         
-        print(image_string)
+       
         
         
         
@@ -147,7 +163,7 @@ def login_page(request):
             messages.error(request, "Incorrect Password")
             return redirect("/login")
         
-        print("success")
+       
                 
         # if both of them is successfull only then redirection to the main page
         login(request, user)
@@ -191,16 +207,37 @@ def register_page(request):
             
     return render(request,"register.html")
 
-
+@login_required(login_url="/login")
 def feed(request):
     return render("feed.html")
 
-
+@login_required(login_url="/login")
 def messenger(request):
     return render(request, "messenger.html")
 
+
+@login_required(login_url="/login")
 def friends(request):
     user = request.user
+    
+    
+    
+    all_friends = Friendship.objects.filter(
+       accepted=True
+    )
+    
+ 
+    friends_with=[]
+    
+    for f in all_friends:
+        friend = f.sender if f.sender != user else f.receiver
+        profile = Profile.objects.filter(user=friend).first()
+        friends_with.append({
+            'name': friend.username,
+            'image': base64_to_image(profile.profile_picture) if profile.profile_picture else None
+        })
+
+        
     
     receivedRequests = Friendship.objects.filter(receiver=user,accepted=False)
     
@@ -230,7 +267,8 @@ def friends(request):
     # Always ensure context is defined before returning the response
     context = {
         'received_reqs': received_reqs,
-        'sent_reqs': sent_reqs
+        'sent_reqs': sent_reqs,
+        'friends_with':friends_with
     }
     
     return render(request, "friends.html", context)
@@ -246,6 +284,7 @@ def friends(request):
     return render(request, "friends.html",context)
 
 
+@login_required(login_url="/login")
 def profile(request):
     user=request.user
     
@@ -253,7 +292,7 @@ def profile(request):
     
     all_posts=Posts.objects.filter(user=user)
     
-    print(all_posts)
+
     
     liked_posts = Like.objects.filter(user=user).values_list('post_id', flat=True)
     liked_posts_set = set(liked_posts)
@@ -287,7 +326,7 @@ def profile(request):
    
     
     if request.method == "POST":
-        print("reached..")
+
         file = request.FILES.get('profilepic')
         if file:
             profile_string = image_to_base64(file)
@@ -305,13 +344,13 @@ def profile(request):
     return render(request, "profile.html", context)
 
 
-
+@login_required(login_url="/login")
 def like_post(request,post_id):
     
     
     post=get_object_or_404(Posts, id=post_id)
     
-    print(post_id)
+
     
     existing_like = Like.objects.filter(user=request.user, post=post).first()
     
@@ -332,15 +371,15 @@ def like_post(request,post_id):
 
 
 
-
+@login_required(login_url="/login")
 def add_comment(request,post_id):
-    print("add comment")
+
     post=get_object_or_404(Posts , id=post_id)
     
     if request.method=="POST":
-        print("reached")
+
         comment_text = request.POST.get('comment_text')
-        print(comment_text)
+
         if comment_text:
             Comment.objects.create(user=request.user, post=post, content=comment_text)
             messages.success(request, "Comment Added successfully.", extra_tags="add_comment")
@@ -358,7 +397,7 @@ def add_comment(request,post_id):
 
 
 
-
+@login_required(login_url="/login")
 def delete_comment(request,post_id,comment_id):
     comment=get_object_or_404(Comment,id=comment_id,post_id=post_id,user=request.user)
     
@@ -374,7 +413,7 @@ def delete_comment(request,post_id,comment_id):
 
 
 
-
+@login_required(login_url="/login")
 def search_friends(request):
     user=request.user
     query=request.GET.get('search','').strip()
@@ -405,7 +444,7 @@ def search_friends(request):
 
 
 
-
+@login_required(login_url="/login")
 def profile_url(request,username):
     user=get_object_or_404(User,username=username)
     
@@ -433,15 +472,13 @@ def profile_url(request,username):
 
 
 
-
+@login_required(login_url="/login")
 def send_request(request,username):
-    print("send request reached..")
-    print(username)
+
     user=request.user
     friend_req_receiver=get_object_or_404(User,username=username)
     
-    print(user)
-    print(friend_req_receiver)
+
     
     
 
@@ -462,22 +499,22 @@ def send_request(request,username):
     return redirect('/')
 
 
-
+@login_required(login_url="/login")
 def accept_request(request):
     
-    print("accept request reached..")
+
     
     if request.method=="POST":
         
         
         sender_name=request.POST.get('sender')
-        print(f"Sender:{sender_name}")
+
         user=request.user
         
         
         if sender_name:
             friend_requests=Friendship.objects.filter(sender__username=sender_name,receiver=user)
-            print(friend_requests)
+
             
             
             for req in friend_requests:
@@ -488,15 +525,16 @@ def accept_request(request):
     
     return redirect('/friends')
         
-    
+
+@login_required(login_url="/login")    
 def reject_request(request):
     
 
     
     if request.method=="POST":
-        print("reject request received..")
+
         sender_name=request.POST.get('sender')
-        print(f"Sender:{sender_name}")
+ 
         user=request.user
         
         
@@ -519,11 +557,11 @@ def reject_request(request):
 
 
 
-
+@login_required(login_url="/login")
 def cancel_request(request):
     
     
-    print("cancel request reached..")
+
     
     if request.method=="POST":
         data=request.POST
@@ -534,8 +572,7 @@ def cancel_request(request):
        
         user=request.user
         
-        print(f"Sent to:{sent_to}")
-        print(f"Sender :{user}")
+
         
         if sent_to:
             friend_req=Friendship.objects.filter(receiver__username=sent_to,sender=user)
@@ -543,6 +580,47 @@ def cancel_request(request):
             
             
     return redirect("/friends")
+
+
+
+
+@login_required(login_url="/login")
+def unfriend(request):
+    user = request.user
+    
+    if request.method == "POST":
+
+        data = request.POST
+        
+        unfriend_username = data.get('unfriend')
+        
+
+        
+        # Get the User instance for the user to unfriend
+        try:
+            unfriend_user = User.objects.get(username=unfriend_username)
+        except User.DoesNotExist:
+
+            return redirect('/friends')
+        
+
+        
+        # Find and delete the friendship records involving the current user and the unfriend_user
+        friendships_to_delete = Friendship.objects.filter(
+            (Q(sender=user) & Q(receiver=unfriend_user)) | 
+            (Q(sender=unfriend_user) & Q(receiver=user)),
+            accepted=True
+        )
+        
+
+        
+        friendships_to_delete.delete()
+        
+
+    
+    return redirect('/friends')
+        
+        
             
             
         

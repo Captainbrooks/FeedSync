@@ -102,7 +102,7 @@
     class="hidden lg:block fixed top-0 sm:top-52 right-0 w-64 lg:w-80 h-screen transition-transform -translate-x-full sm:translate-x-0"
     aria-label="Sidebar">
     <div class="h-full px-3 py-4 overflow-y-auto bg-gray-50 dark:bg-gray-800">
-        <ul class="space-y-2 font-medium">
+        <ul class="space-y-1 font-medium">
             <li>
                 <a href="#"
                     class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
@@ -116,6 +116,37 @@
                     <span class="ms-3">Contacts</span>
                 </a>
             </li>
+
+
+            <li>
+                <div class="rounded-lg p-1 dark:bg-gray-800 mb-1">
+                    {% if my_friends %}
+                    <ul class="space-y-1  h-80 overflow-y-scroll">
+                        {% for friend in my_friends %}
+                        <li class="flex items-center space-x-4 bg-gray-50 p-1 rounded-lg dark:bg-gray-700">
+                            <div class="p-1 flex gap-x-8 items-center w-full hover:bg-gray-200 hover:cursor-pointer">
+                
+                                {% if friend.image %}
+                                <img src="{{ friend.image }}" class="w-12 h-12 rounded-full object-cover" alt="Pending Req User">
+                               
+                                {% else %}
+                                <div class="text-gray-500 dark:text-gray-300">No profile picture</div>
+                                {% endif %}
+                                <p class="text-lg font-semibold text-gray-700 dark:text-white">{{ friend.name }}</p>
+            
+                        
+                            </div>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <p class="text-gray-500 dark:text-gray-300">You have no friends at the moment</p>
+                    {% endif %}
+                </div>
+            </li>
+
+
+
 
 
 
@@ -232,8 +263,8 @@
                             <div class="gap-y-3">
                             <h1 class="ms-2 font-semibold text-xl">{{post.user.username}}</h1>
                             
-                            {% if post.created_at %}
-                            <p class="text-sm text-gray-600">{{ post.created_at|timesince }} ago</p>
+                            {% if post.created_at  %}
+                            <p class="text-sm text-gray-600" >{{ post.created_at|timesince }} ago</p>
                             {% endif %}
                         </div>
                                 
@@ -298,7 +329,7 @@
                                 <a href="{% url 'like_post' post.id %}"
                                     class="{% if post.user_has_liked %}text-blue-500{% else %}text-gray-500{% endif %}">
                                     <i
-                                        class="fa-regular fa-thumbs-up text-2xl {% if post.user_has_liked %}text-blue-500{% else %}text-gray-500{% endif %}"></i>Like
+                                        class="fa-regular fa-thumbs-up text-2xl {% if post.user_has_liked %}text-blue-500{% else %}text-gray-500{% endif %} me-2"></i>Like
                                 </a>
                             </div>
                             <!-- Like end -->
@@ -321,18 +352,18 @@
 
 
                     <!-- comment section -->
-                    <div class="flex flex-col gap-1 p-2  p-5">
+                    <div class="flex flex-col gap-1 p-2">
 
                         {% for comment in post.comments %}
-                        <div class="flex flex-col my-3 mx-5">
+                        <div class="flex flex-col my-3 mx-5 ">
 
 
-                            <div class="comment my-3">
+                            <div class="comment shadow p-1">
 
-                                <div class="flex items-center gap-x-1">
+                                <div class="flex items-center gap-x-1 p-1">
                                     {% if comment.user.profile.profile_picture %}
                                     <img src="data:image/png;base64,{{ comment.user.profile.profile_picture }}" alt="Hi"
-                                        class="rounded-full h-8 w-8 mb-1 object-cover">
+                                        class="rounded-full h-8 w-8  object-cover">
                                     {% else %}
                                     <svg class="w-8 h-8 text-gray-500 dark:text-gray-400" aria-hidden="true"
                                         xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
@@ -343,20 +374,24 @@
                                     {% endif %}
                                     <span class="font-semibold text-sm">{{ comment.user.username }}</span>
                                 </div>
-                                <div class="bg-zinc-100 rounded-lg flex justify-between">
-                                    <p class="ms-8">{{comment.content}}</p>
 
-                                    {% if request.user.is_authenticated and comment.user == request.user %}
+                                <div class="flex justify-between">
+                                    <p class="bg-zinc-100 text-gray-900 px-2 py-1 ms-8 rounded-lg">{{comment.content}}</p>
+
+
+
+                                    {% if request.user.is_authenticated or comment.user == request.user %}
                                     <form action="{% url 'delete_comment' post.id comment.id %}" method="POST">
                                         {% csrf_token %}
-                                        <button
+                                        <button type="submit"
                                             class="font-bold py-1 px-2 rounded-lg my-1 text-red-300 hover:text-red-500 text-lg">
                                             <i class="fa-solid fa-trash"></i>
                                         </button>
                                     </form>
+                                    {% endif %}
 
                                 </div>
-                                {% endif %}
+                             
                             </div>
                         </div>
                         {% endfor %}
@@ -377,17 +412,17 @@
                             </svg>
 
                             {% endif %}
-
                             <form method="POST" action="{% url 'add_comment' post.id %}" enctype="multipart/form-data"
-                                class="w-full bg-zinc-100 outline-none rounded-b-xl m-2 flex flex-col" action="">
-                                {% csrf_token %}
-
-                                <textarea name="comment_text" placeholder="Write a comment"
-                                    class="w-full p-2 bg-zinc-100 outline-none rounded-b-xl"></textarea>
-                                <button class=" flex bg-blue-600 font-bold text-white mx-auto px-6 py-0.5">Post Comment
-                                </button>
-
-                            </form>
+                            class="w-full bg-zinc-100 outline-none rounded-b-xl m-2 flex flex-col shadow-md" id="comment_form">
+                            {% csrf_token %}
+                            <textarea name="comment_text" placeholder="Write a comment" class="w-full p-2 bg-zinc-100 outline-none rounded-b-xl"
+                                id="comment"></textarea>
+                    
+                            <button type="submit" class="flex justify-end font-bold px-6 py-0.5 text-blue-500 text-xl" id="submit_comment">
+                                <i class="fa-solid fa-right-long" id="icon"></i>
+                            </button>
+    
+                        </form>                   
                         </div>
                         <!-- comment form end -->
 
@@ -501,7 +536,34 @@
                 preview.classList.add('hidden');
             }
         });
-        
+
+
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const timeDisplay = document.getElementById('time');
+            const createdAt = new Date(timeDisplay.getAttribute('data-created-at'));
+            const now = new Date();
+            const diffInSeconds = (now - createdAt) / 1000;
+            const diffInMinutes = diffInSeconds / 60;
+            const diffInHours = diffInMinutes / 60;
+    
+            let timeString = '';
+    
+            if (diffInHours >= 1) {
+                // Show hours only if more than 1 hour
+                timeString = `${Math.floor(diffInHours)} hours ago`;
+            } else if (diffInMinutes >= 1) {
+                // Show minutes if less than 1 hour
+                timeString = `${Math.floor(diffInMinutes)} minutes ago`;
+            } else {
+                // If less than a minute, display "Just now"
+                timeString = 'Just now';
+            }
+    
+            timeDisplay.textContent = timeString;
+        });
+
+
 
     </script>
     {% endblock %}
