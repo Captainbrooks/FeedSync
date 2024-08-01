@@ -25,41 +25,60 @@ def base64_to_image(base64_string):
    return f"data:image/png;base64,{base64_string}"
 
 
-@login_required(login_url="/login")
 def index(request):
+    user = request.user
     
-    user=request.user
-    all_posts=Posts.objects.filter(user=user)
+    # Retrieve all accepted friendships where the user is either the sender or receiver
+    friends_with = Friendship.objects.filter(
+        Q(sender=user) | Q(receiver=user), 
+        accepted=True
+    )
     
-    print(all_posts)
+    # Extract the users who are friends
+    friend_users = set(friends_with.values_list('receiver', flat=True)) | set(friends_with.values_list('sender', flat=True))
     
+    # Include the current user in the list of users
+    friend_users.add(user)
+    
+    # Query posts from the current user and friends
+    all_posts = Posts.objects.filter(user__in=friend_users).order_by('-created_at')
+    
+    # Get liked posts for the current user
     liked_posts = Like.objects.filter(user=user).values_list('post_id', flat=True)
     liked_posts_set = set(liked_posts)
     
-    
-    
-    
-    
-    
-    
-    image=Posts.objects.filter(user=user)
+    # Retrieve profile images for all users who have posts
+    users_with_posts = set(all_posts.values_list('user', flat=True))
+    profiles = Profile.objects.filter(user__in=users_with_posts)
+    profile_images = {profile.user.id: base64_to_image(profile.profile_picture) for profile in profiles if profile.profile_picture}
     
     for post in all_posts:
+        # Convert post image to base64 if it exists
         if post.image:
             post.image_url = f"data:image/png;base64,{post.image}"
-        post.user_has_liked = post.id in liked_posts_set  
+        
+        # Check if the current user has liked this post
+        post.user_has_liked = post.id in liked_posts_set
+        
+        # Retrieve comments for the post
         post.comments = Comment.objects.filter(post=post)
         
-        post.like_count=post.get_like_count()
+        # Retrieve like and comment counts for the post
+        post.like_count = post.get_like_count()
+        post.comment_count = post.get_comment_count()
         
-        post.comment_count=post.get_comment_count() 
-            
-            
-            
+        # Set the profile image URL of the user who made the post
+        post.user_profile_image_url = profile_images.get(post.user.id, None)
+    
+    # Retrieve the profile image URL for the current user
     profile = Profile.objects.filter(user=user).first()
-    profile_image_url = base64_to_image(profile.profile_picture) if profile and profile.profile_picture else None  
-               
-    context={'posts':all_posts,'profile_image_url': profile_image_url}
+    profile_image_url = base64_to_image(profile.profile_picture) if profile and profile.profile_picture else None
+    
+    # Context for the template
+    context = {
+        'posts': all_posts,
+        'profile_image_url': profile_image_url
+    }
     
     
     
@@ -465,46 +484,72 @@ def accept_request(request):
                 if not req.accepted:
                     req.accepted = True
                     req.save()
+
+    
+    return redirect('/friends')
+        
+    
+def reject_request(request):
+    
+
+    
+    if request.method=="POST":
+        print("reject request received..")
+        sender_name=request.POST.get('sender')
+        print(f"Sender:{sender_name}")
+        user=request.user
+        
+        
+        if sender_name:
+            friend_requests=Friendship.objects.filter(sender__username=sender_name,receiver=user)
+            friend_requests.delete()
             
-    
 
-  
-    
-    
-    # friend_requests = Friendship.objects.filter(receiver=user,sender=sender)
-    # print(friend_requests)
-    
-    # for r in friend_requests:
-    #     print(r.id)
-    
-    # for req in friend_requests:
-    #     print(f"Before: Request from {req.sender} to {req.receiver}, accepted: {req.accepted}")
-        
-    #     # Check if the request is not already accepted
-    #     if not req.accepted:
-    #         req.accepted = True
-    #         req.save()  # Save the change to the database
-    #         print(f"After: Request from {req.sender} to {req.receiver}, accepted: {req.accepted}")
-    
-    return redirect('/friends')
-        
-        
-    
-    
-        
-        
+            
+            
+            
+            
+            
+            
+
+                    
+                    
     return redirect('/friends')
 
 
 
 
-def reject_friend_request(request, request_id):
-    friendship_request = get_object_or_404(Friendship, id=request_id, receiver=request.user)
+
+def cancel_request(request):
     
-    if not friendship_request.accepted:
-        friendship_request.delete()
     
-    return redirect('friend_requests')
+    print("cancel request reached..")
+    
+    if request.method=="POST":
+        data=request.POST
+        
+        sent_to=request.POST.get('send_to')
+        
+       
+       
+        user=request.user
+        
+        print(f"Sent to:{sent_to}")
+        print(f"Sender :{user}")
+        
+        if sent_to:
+            friend_req=Friendship.objects.filter(receiver__username=sent_to,sender=user)
+            friend_req.delete()
+            
+            
+    return redirect("/friends")
+            
+            
+        
+        
+
+    
+
     
     
         
