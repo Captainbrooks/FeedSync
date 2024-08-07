@@ -45,7 +45,7 @@
                     <span class="flex-1 ms-3 whitespace-nowrap">Friends</span>
                 </a>
             </li>
-      
+
             <li>
                 <a href="/logout"
                     class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
@@ -212,7 +212,7 @@
                     <div class="flex justify-between items-center px-2">
 
                         <!-- each post header -->
-                        <div class="flex items-center p-2 gap-1">
+                        <div class="flex  items-center p-2 gap-1">
                             {% if post.user_profile_image_url %}
                             <img src="{{ post.user_profile_image_url }}" alt="Hi"
                                 class="rounded-full border h-12 w-12 mb-1 object-cover">
@@ -228,7 +228,12 @@
                             <h1 class="ms-2 font-semibold text-xl">{{post.user.username}}</h1>
                             
                             {% if post.created_at  %}
-                            <p class="text-sm text-gray-600" >{{ post.created_at|timesince }} ago</p>
+                           
+                            <input type="text" class="time-posted text-sm text-gray-600 ps-2 border-none outline-none w-10" value='{{ post.created_at|timesince }}' disabled/>.
+                        
+                                <i class="fa-duotone fa-solid fa-earth-americas p-0" style="--fa-primary-color: #898888; --fa-secondary-color: #fffafa;"></i>
+                     
+                              
                             {% endif %}
                         </div>
                                 
@@ -249,14 +254,37 @@
                                 class="hidden absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
                                 <div class="py-1" role="menu" aria-orientation="vertical"
                                     aria-labelledby="dropdownButton-{{ forloop.counter }}">
+
+                                    
+                                
+
+
+                                    
+                                    {% if not request.user == post.user %}
+
+ <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                    role="menuitem">Report</a>
+ <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                    role="menuitem">Share</a>
+
+                                        
+                                    {% else %}
+
                                     <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                                        role="menuitem">Share</a>
-                                    <a href="/edit/{{post.id}}"
-                                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                                        role="menuitem">Edit</a>
-                                    <a href="/delete/{{post.id}}"
-                                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                                        role="menuitem">Delete</a>
+                                    role="menuitem">Share</a>
+                                        
+                                    {% endif %}
+                                                                            
+                                        {% if request.user == post.user %}
+                                        <a href="/updatePost/{{post.id}}"
+                                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                            role="menuitem">Edit</a>
+                                        <a href="/deletePost/{{post.id}}"
+                                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                            role="menuitem">Delete</a>
+                                    {% endif %}
+                                            
+                                 
                                 </div>
                             </div>
                         </div>
@@ -431,6 +459,10 @@
 
 
 
+
+
+
+
     <script>
 
         document.addEventListener('DOMContentLoaded', function () {
@@ -502,30 +534,37 @@
         });
 
 
-
         document.addEventListener('DOMContentLoaded', function() {
-            const timeDisplay = document.getElementById('time');
-            const createdAt = new Date(timeDisplay.getAttribute('data-created-at'));
-            const now = new Date();
-            const diffInSeconds = (now - createdAt) / 1000;
-            const diffInMinutes = diffInSeconds / 60;
-            const diffInHours = diffInMinutes / 60;
-    
-            let timeString = '';
-    
-            if (diffInHours >= 1) {
-                // Show hours only if more than 1 hour
-                timeString = `${Math.floor(diffInHours)} hours ago`;
-            } else if (diffInMinutes >= 1) {
-                // Show minutes if less than 1 hour
-                timeString = `${Math.floor(diffInMinutes)} minutes ago`;
-            } else {
-                // If less than a minute, display "Just now"
-                timeString = 'Just now';
-            }
-    
-            timeDisplay.textContent = timeString;
+            const postTimeElements = document.querySelectorAll('.time-posted');
+        
+            postTimeElements.forEach(function(postTimeElement) {
+                const postTime = postTimeElement.value;
+                const timeArray = parseDuration(postTime);
+        
+                if (timeArray[1] === "days") {
+                    postTimeElement.value = `${timeArray[0]}d`;
+                } else if (timeArray[1] === "hour" || timeArray[1]==="hours") {
+                    postTimeElement.value = `${timeArray[0]}h`;
+                } else if (timeArray[1] === "minutes") {
+                    postTimeElement.value = `${timeArray[0]}m`;
+                }
+            });
         });
+        
+        function parseDuration(duration) {
+            const regex = /(\d+)\s(\w+)/g;
+            let match;
+            const result = [];
+        
+            while ((match = regex.exec(duration)) !== null) {
+                result.push(match[1], match[2]);
+            }
+        
+            return result;
+        }
+        
+        
+
 
 
 

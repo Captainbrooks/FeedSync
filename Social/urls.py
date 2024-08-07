@@ -23,13 +23,18 @@ urlpatterns = [
     path('index/', index , name="index"),
     path('login/',login_page,name="login_page"),
     path('register/',register_page,name="register_page"),
+    
     path('feed/',feed,name="feed"),
+    
     path('messenger/',messenger,name="messenger"),
+    
     path('profile/',profile,name="profile"),
     path('friends/',friends,name="friends"),
     path('like/<int:post_id>/', like_post, name='like_post'),
     path('post/<int:post_id>/add_comment/',add_comment, name='add_comment'),
     path('post/<int:post_id>/<int:comment_id>/delete_comment',delete_comment, name='delete_comment'),
+    path('updatePost/<int:post_id>',updatePost,name="updatePost"),
+    path('deletePost/<int:post_id>',deletePost,name="deletePost"),
     path('search_friends/',search_friends,name="search_friends"),
     path('profile/<str:username>/',profile_url,name="profile_url"),
     path('send_request/<str:username>/', send_request, name='send_request'),

@@ -14,7 +14,7 @@ from django.contrib.auth.models import User
 class Posts(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     caption=models.CharField(max_length=1000)
-    image=models.TextField(null=False,blank=True)
+    image=models.TextField(null=False,blank=False)
     created_at = models.DateTimeField(auto_now_add=True)
     
     

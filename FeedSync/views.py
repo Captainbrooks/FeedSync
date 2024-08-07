@@ -622,7 +622,85 @@ def unfriend(request):
         
         
             
-            
+     
+     
+def updatePost(request,post_id):
+    user=request.user
+    
+    update_post=Posts.objects.get(user=user,id=post_id)
+    
+    print(f"Updating Post:{update_post.caption}")
+    
+    if request.method=="POST":
+        data=request.POST
+        
+        post_caption=data.get('caption')
+        
+        trim_caption=post_caption
+        
+        if not trim_caption:
+             messages.error(request, "Caption cannot be spaces only.Please enter a caption")
+             return redirect("/index")
+         
+        image_string=""
+         
+        if request.FILES:
+            file=request.FILES.get('image')
+            if file:
+                image_string=image_to_base64(file)
+            else:
+                None
+                  
+               
+
+        update_post.caption=post_caption
+        
+        if image_string:
+            update_post.image=image_string
+        else:
+            update_post.image=None
+        
+        update_post.save()
+        
+        return redirect('/index/')
+        
+    
+    
+    context={
+        'post_caption':update_post.caption,
+        'post_image':base64_to_image(update_post.image) if update_post.image else None
+    }
+    
+    
+    return render(request,"updatePost.html" ,context)   
+
+
+
+
+
+
+def deletePost(request,post_id):
+    user=request.user
+    
+    delete_post=Posts.objects.get(user=user,id=post_id)
+    
+    if not delete_post:
+        messages.error("The post is not found")
+        
+    else:
+        delete_post.delete()
+        
+        
+    return redirect('/index')
+        
+    
+        
+    
+
+        
+
+    
+ 
         
         
 
@@ -684,7 +762,7 @@ def logout_page(request):
     
     
     
-    return redirect('/index')
+
     
     
 
