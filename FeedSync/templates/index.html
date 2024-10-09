@@ -212,7 +212,7 @@
                     <div class="flex justify-between items-center px-2">
 
                         <!-- each post header -->
-                        <div class="flex  items-center p-2 gap-1">
+                <div class="flex  items-center p-2 gap-1">
                             {% if post.user_profile_image_url %}
                             <img src="{{ post.user_profile_image_url }}" alt="Hi"
                                 class="rounded-full border h-12 w-12 mb-1 object-cover">
@@ -235,7 +235,7 @@
                      
                               
                             {% endif %}
-                        </div>
+                        </div> 
                                 
                            
                         </div>
@@ -316,15 +316,36 @@
                         <div class="flex justify-around items-center ">
                             <!-- Like -->
                             <div class="px-2 py-0.5 flex gap-2 items-center font-semibold hover:bg-zinc-200">
-                                </form method="POST">
-
                                 <a href="{% url 'like_post' post.id %}"
-                                    class="{% if post.user_has_liked %}text-blue-500{% else %}text-gray-500{% endif %}">
-                                    <i
-                                        class="fa-regular fa-thumbs-up text-2xl {% if post.user_has_liked %}text-blue-500{% else %}text-gray-500{% endif %} me-2"></i>Like
+                                    class="like-btn {% if post.user_has_liked %}text-blue-500{% else %}text-gray-500{% endif %}"
+                                    data-liked="{% if post.user_has_liked %}true{% else %}false{% endif %}">
+                                    <i class="fa-regular fa-thumbs-up text-2xl {% if post.user_has_liked %}text-blue-500{% else %}text-gray-500{% endif %} me-2"></i>Like
                                 </a>
                             </div>
+
+                            <audio id="like-sound" src="\static\sound\likesound.wav" preload="auto"></audio>
                             <!-- Like end -->
+
+                            <script>
+                                document.querySelectorAll('.like-btn').forEach(button => {
+                                    button.addEventListener('click', function(event) {
+                                        const isLiked = this.getAttribute('data-liked') === 'true';
+                            
+                                        if (!isLiked) {
+                                            document.getElementById('like-sound').play();
+                                        }
+                            
+                                        // Toggle the like state
+                                        this.setAttribute('data-liked', !isLiked);
+                                        this.classList.toggle('text-blue-500', !isLiked);
+                                        this.classList.toggle('text-gray-500', isLiked);
+                            
+                                        // Update the icon color
+                                        this.querySelector('i').classList.toggle('text-blue-500', !isLiked);
+                                        this.querySelector('i').classList.toggle('text-gray-500', isLiked);
+                                    });
+                                });
+                            </script>
 
                             <!-- comment -->
                             <div class="px-2 py-0.5 flex gap-2 items-center font-semibold hover:bg-zinc-200">
@@ -351,9 +372,9 @@
 
 
                             <div class="comment shadow p-1">
-
                                 <div class="flex items-center gap-x-1 p-1">
                                     {% if comment.user.profile.profile_picture %}
+
                                     <img src="data:image/png;base64,{{ comment.user.profile.profile_picture }}" alt="Hi"
                                         class="rounded-full h-8 w-8  object-cover">
                                     {% else %}
@@ -372,7 +393,7 @@
 
 
 
-                                    {% if request.user.is_authenticated or comment.user == request.user %}
+                                    {% if request.user == post.user or request.user == comment.user %}
                                     <form action="{% url 'delete_comment' post.id comment.id %}" method="POST">
                                         {% csrf_token %}
                                         <button type="submit"
@@ -465,6 +486,16 @@
 
     <script>
 
+
+
+
+
+
+
+
+
+
+
         document.addEventListener('DOMContentLoaded', function () {
             const dropdownButtons = document.querySelectorAll('[id^="dropdownButton-"]');
             dropdownButtons.forEach(button => {
@@ -545,8 +576,11 @@
                     postTimeElement.value = `${timeArray[0]}d`;
                 } else if (timeArray[1] === "hour" || timeArray[1]==="hours") {
                     postTimeElement.value = `${timeArray[0]}h`;
-                } else if (timeArray[1] === "minutes") {
+                } else if (timeArray[1] === "minutes" || "minute") {
                     postTimeElement.value = `${timeArray[0]}m`;
+                }
+                else if(timeArray[1] === "week" || timeArray[1]==='weeks'){
+                    postTimeElement.value=`${timeArray[0]}w`
                 }
             });
         });

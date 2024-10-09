@@ -24,15 +24,28 @@ def image_to_base64(image_path):
 def base64_to_image(base64_string):
    return f"data:image/png;base64,{base64_string}"
 
+
+def base(admin):
+    admin_profile=get_object_or_404(Profile,user=admin)
+    
+    admin_info={
+        'admin_name':admin_profile.user.username,
+        'admin_profile_image':base64_to_image(admin_profile.profile_picture) if admin_profile.profile_picture else None
+    }
+    
+    
+    return admin_info
+    
+    
+
 @login_required(login_url="/login")
 def index(request):
     user = request.user
     
-    # Retrieve all accepted friendships where the user is either the sender or receiver
+   # getting the friends of the current logged in user where friendship exists no matter if the req was sent by user or received by user
     friends_with = Friendship.objects.filter(
         Q(sender=user) | Q(receiver=user), 
-        accepted=True
-    )
+        accepted=True)
     
     # Extract the users who are friends
     friend_users = set(friends_with.values_list('receiver', flat=True)) | set(friends_with.values_list('sender', flat=True))
@@ -47,23 +60,23 @@ def index(request):
     liked_posts = Like.objects.filter(user=user).values_list('post_id', flat=True)
     liked_posts_set = set(liked_posts)
     
-    # Retrieve profile images for all users who have posts
+    # # Retrieve profile images for all users who have posts
     users_with_posts = set(all_posts.values_list('user', flat=True))
     profiles = Profile.objects.filter(user__in=users_with_posts)
     profile_images = {profile.user.id: base64_to_image(profile.profile_picture) for profile in profiles if profile.profile_picture}
     
     for post in all_posts:
-        # Convert post image to base64 if it exists
+    #     # Convert post image to base64 if it exists
         if post.image:
             post.image_url = f"data:image/png;base64,{post.image}"
         
-        # Check if the current user has liked this post
+    #     # Check if the current user has liked this post
         post.user_has_liked = post.id in liked_posts_set
         
-        # Retrieve comments for the post
+    #     # Retrieve comments for the post
         post.comments = Comment.objects.filter(post=post)
         
-        # Retrieve like and comment counts for the post
+    #     # Retrieve like and comment counts for the post
         post.like_count = post.get_like_count()
         post.comment_count = post.get_comment_count()
         
@@ -75,7 +88,8 @@ def index(request):
     profile_image_url = base64_to_image(profile.profile_picture) if profile and profile.profile_picture else None
     
     all_friends = Friendship.objects.filter(
-       accepted=True
+        Q(sender=user) | Q(receiver=user), 
+        accepted=True
     )
     
  
@@ -97,11 +111,6 @@ def index(request):
     }
     
     
-    
-    
-    
-    
-   
     
     if request.method == "POST":
       
@@ -125,8 +134,7 @@ def index(request):
         
        
         
-        
-        
+  
         Posts.objects.create(
             user=user,
             caption=caption,
@@ -135,7 +143,6 @@ def index(request):
         
         return redirect('/index')
     
-
     return render(request,"index.html",context)
 
 
@@ -213,7 +220,16 @@ def feed(request):
 
 @login_required(login_url="/login")
 def messenger(request):
-    return render(request, "messenger.html")
+    
+    user=request.user
+     # Retrieve the profile image URL for the current user
+    profile = Profile.objects.filter(user=user).first()
+    profile_image_url = base64_to_image(profile.profile_picture) if profile and profile.profile_picture else None
+    
+    context={
+        'profile_image_url': profile_image_url,
+    }
+    return render(request, "messenger.html",context)
 
 
 @login_required(login_url="/login")
@@ -221,15 +237,18 @@ def friends(request):
     user = request.user
     
     
-    
+  
     all_friends = Friendship.objects.filter(
-       accepted=True
-    )
+   
+         Q(sender=user) | Q(receiver=user), 
+        accepted=True)
     
- 
     friends_with=[]
     
     for f in all_friends:
+        print(f"Sender: {f.sender}")
+        print(f"Receiver: {f.receiver}")
+   
         friend = f.sender if f.sender != user else f.receiver
         profile = Profile.objects.filter(user=friend).first()
         friends_with.append({
@@ -237,8 +256,6 @@ def friends(request):
             'image': base64_to_image(profile.profile_picture) if profile.profile_picture else None
         })
 
-        
-    
     receivedRequests = Friendship.objects.filter(receiver=user,accepted=False)
     
     sentRequests = Friendship.objects.filter(sender=user,accepted=False)
@@ -263,24 +280,35 @@ def friends(request):
                 'receiver': profile.user.username,
                 'image': base64_to_image(profile.profile_picture) if profile.profile_picture else None
             })
+            
+            
+    profile = Profile.objects.filter(user=user).first()
+    profile_image_url = base64_to_image(profile.profile_picture) if profile and profile.profile_picture else None
+            
+ 
+    
+    
+    
+    
+    
+
+            
+  
+            
+   
     
     # Always ensure context is defined before returning the response
     context = {
         'received_reqs': received_reqs,
         'sent_reqs': sent_reqs,
-        'friends_with':friends_with
+        'friends_with':friends_with,
+        'profile_image_url':profile_image_url
+        
+        
     }
     
     return render(request, "friends.html", context)
-
-            
-        
-        
-    
-   
-    
-
-    
+ 
     return render(request, "friends.html",context)
 
 
@@ -288,28 +316,29 @@ def friends(request):
 def profile(request):
     user=request.user
     
-    all_posts=Posts.objects.filter(user=user)
+
     
-    all_posts=Posts.objects.filter(user=user)
+    all_posts=Posts.objects.filter(user=user).order_by('-created_at')
     
 
     
-    liked_posts = Like.objects.filter(user=user).values_list('post_id', flat=True)
+    liked_posts = Like.objects.filter(user=request.user).values_list('post_id', flat=True)
     liked_posts_set = set(liked_posts)
     
-    
-    
-    
-    
-    
-    
-    image=Posts.objects.filter(user=user)
     
     for post in all_posts:
         if post.image:
             post.image_url = f"data:image/png;base64,{post.image}"
         post.user_has_liked = post.id in liked_posts_set  
-        post.comments = Comment.objects.filter(post=post)
+        
+        
+        post.comments=Comment.objects.filter(post=post)
+        
+        post.like_count = post.get_like_count()
+        post.comment_count = post.get_comment_count()
+        
+        profile = Profile.objects.filter(user=user).first()
+        profile_image_url = base64_to_image(profile.profile_picture) if profile and profile.profile_picture else None
         
         post.like_count=post.get_like_count()
         
@@ -319,12 +348,23 @@ def profile(request):
             
     profile = Profile.objects.filter(user=user).first()
     profile_image_url = base64_to_image(profile.profile_picture) if profile and profile.profile_picture else None  
-               
     
-   
-  
-   
     
+    
+    # Add friend or Unfrend logic at UI.. checking if friendship exists..
+    all_friends=Friendship.objects.filter(
+        Q(sender=user) | Q(receiver=user), 
+        accepted=True)
+    
+    print(f"My friends : {all_friends}")
+    
+    my_friends=[]
+    
+    for f in all_friends:
+        friend = f.sender if f.sender != user else f.receiver
+        my_friends.append(friend.username)
+        
+
     if request.method == "POST":
 
         file = request.FILES.get('profilepic')
@@ -340,7 +380,7 @@ def profile(request):
     profile = Profile.objects.filter(user=user).first()
     profile_image_url = base64_to_image(profile.profile_picture) if profile and profile.profile_picture else None
     
-    context = {'profile_image_url': profile_image_url,'posts':all_posts,'profile_image_url': profile_image_url}
+    context = {'profile_image_url': profile_image_url,'posts':all_posts,'profile_image_url': profile_image_url,'my_friends':my_friends}
     return render(request, "profile.html", context)
 
 
@@ -350,6 +390,8 @@ def like_post(request,post_id):
     
     post=get_object_or_404(Posts, id=post_id)
     
+    current_page = request.META.get('HTTP_REFERER', '/')
+    
 
     
     existing_like = Like.objects.filter(user=request.user, post=post).first()
@@ -357,24 +399,21 @@ def like_post(request,post_id):
     if existing_like:
         # If like exists, remove it (unlike the post)
         existing_like.delete()
+        
     else:
         # Otherwise, create a new like
         Like.objects.create(user=request.user, post=post)
     
     # Redirect to the post's detail page or another appropriate page
-    return redirect('/index', post_id=post_id)
+    return redirect(current_page, post_id=post_id)
     
-    
-    
-
-
-
-
 
 @login_required(login_url="/login")
 def add_comment(request,post_id):
 
     post=get_object_or_404(Posts , id=post_id)
+    
+    current_page = request.META.get('HTTP_REFERER', '/')
     
     if request.method=="POST":
 
@@ -383,7 +422,7 @@ def add_comment(request,post_id):
         if comment_text:
             Comment.objects.create(user=request.user, post=post, content=comment_text)
             messages.success(request, "Comment Added successfully.", extra_tags="add_comment")
-            return redirect('/')
+            return redirect(current_page)
         
         else:
             messages.error(request,"COuldn't add a comment")
@@ -392,7 +431,7 @@ def add_comment(request,post_id):
             
             
             
-    return redirect('/')   
+    return redirect(current_page)
 
 
 
@@ -401,15 +440,15 @@ def add_comment(request,post_id):
 def delete_comment(request,post_id,comment_id):
     comment=get_object_or_404(Comment,id=comment_id,post_id=post_id,user=request.user)
     
+    current_page = request.META.get('HTTP_REFERER', '/')
+    
     if request.method == "POST":
         comment.delete()
         messages.success(request, "Comment deleted successfully.", extra_tags="delete_comment")
     else:
         messages.error(request, "Invalid request method.")
 
-    return redirect('/index')
-
-
+    return redirect(current_page)
 
 
 
@@ -445,45 +484,79 @@ def search_friends(request):
 
 
 @login_required(login_url="/login")
-def profile_url(request,username):
-    user=get_object_or_404(User,username=username)
+def profile_url(request, username):
     
-    profile=get_object_or_404(Profile, user=user)
+    
+    admin=request.user
+    admin_profile=get_object_or_404(Profile,user=admin)
+    
+    print(f"admin:{admin_profile.user.username}")
+    user = get_object_or_404(User, username=username)
+    profile = get_object_or_404(Profile, user=user)
     
 
     
     
-    profile_info={
-        'profile_name':profile.user.username,
-        'profile_image':base64_to_image(profile.profile_picture) if profile.profile_picture else None
+    admin_info={
+        'admin_name':admin_profile.user.username,
+        'admin_profile_image':base64_to_image(admin_profile.profile_picture) if admin_profile.profile_picture else None
     }
     
+    profile_info = {
+        'profile_name': profile.user.username,
+        'profile_image': base64_to_image(profile.profile_picture) if profile.profile_picture else None
+    }
+       
+    all_posts=Posts.objects.filter(user=user).order_by('-created_at')
     
-    context={'profile_info':profile_info}
+    liked_posts=Like.objects.filter(user=request.user).values_list('post_id', flat=True)
+    liked_posts_set=set(liked_posts)
     
+    
+    for post in all_posts:
+        
+        if post.image:
+            post.image_url=f"data:image/png;base64,{post.image}"
+            
+        post.user_has_liked=post.id in liked_posts_set
+        
+        post.comments=Comment.objects.filter(post=post)
+    
+            
+        post.like_count = post.get_like_count()
+        post.comment_count = post.get_comment_count()
+        
+        
+        all_friends=Friendship.objects.filter(
+        Q(sender=admin) | Q(receiver=admin), 
+        accepted=True)
+        
+        my_friends=[]
+    
+        for f in all_friends:
+            friend = f.sender if f.sender != admin else f.receiver
+            my_friends.append(friend.username)
+                  
+
+    profile_image_url = base64_to_image(profile.profile_picture) if profile and profile.profile_picture else None
 
     
+    context={'profile_info':profile_info,'posts':all_posts,'profile_image_url': profile_image_url, 'admin_info':admin_info,'my_friends':my_friends}
     
     return render(request, "profile_url.html",context)
-
-
-
-
-
 
 
 @login_required(login_url="/login")
 def send_request(request,username):
 
     user=request.user
+
+    
     friend_req_receiver=get_object_or_404(User,username=username)
-    
-
-    
-    
-
+    print(friend_req_receiver)
     
     existingfriendship=Friendship.objects.filter(
+     
         Q(sender=user, receiver=friend_req_receiver) |
         Q(sender=friend_req_receiver, receiver=user)).exists()
     if not existingfriendship:
@@ -501,9 +574,7 @@ def send_request(request,username):
 
 @login_required(login_url="/login")
 def accept_request(request):
-    
 
-    
     if request.method=="POST":
         
         
@@ -528,9 +599,7 @@ def accept_request(request):
 
 @login_required(login_url="/login")    
 def reject_request(request):
-    
-
-    
+   
     if request.method=="POST":
 
         sender_name=request.POST.get('sender')
@@ -555,14 +624,10 @@ def reject_request(request):
     return redirect('/friends')
 
 
-
-
 @login_required(login_url="/login")
 def cancel_request(request):
     
-    
 
-    
     if request.method=="POST":
         data=request.POST
         
@@ -582,28 +647,26 @@ def cancel_request(request):
     return redirect("/friends")
 
 
-
-
 @login_required(login_url="/login")
 def unfriend(request):
     user = request.user
+    print(user)
+    
+    current_page = request.META.get('HTTP_REFERER', '/')
     
     if request.method == "POST":
 
         data = request.POST
         
         unfriend_username = data.get('unfriend')
-        
-
-        
+        print(unfriend_username)
+     
         # Get the User instance for the user to unfriend
-        try:
-            unfriend_user = User.objects.get(username=unfriend_username)
-        except User.DoesNotExist:
-
-            return redirect('/friends')
+   
+        unfriend_user = User.objects.get(username=unfriend_username)
+            
+        print(unfriend_user)
         
-
         
         # Find and delete the friendship records involving the current user and the unfriend_user
         friendships_to_delete = Friendship.objects.filter(
@@ -612,18 +675,11 @@ def unfriend(request):
             accepted=True
         )
         
-
-        
         friendships_to_delete.delete()
+    return redirect(current_page)
         
-
+        
     
-    return redirect('/friends')
-        
-        
-            
-     
-     
 def updatePost(request,post_id):
     user=request.user
     
@@ -676,9 +732,6 @@ def updatePost(request,post_id):
 
 
 
-
-
-
 def deletePost(request,post_id):
     user=request.user
     
@@ -693,58 +746,6 @@ def deletePost(request,post_id):
         
     return redirect('/index')
         
-    
-        
-    
-
-        
-
-    
- 
-        
-        
-
-    
-
-    
-    
-        
-        
-    
-   
-    
-    
-    
-    
-    
-            
-            
-
-
-    
-
-        
-    
-    
-
-    
-    
-        
-            
-        
-        
-        
- 
-    
-    
-
-  
-    
-    
-    
-
-
-
 
 
 def logout_page(request):

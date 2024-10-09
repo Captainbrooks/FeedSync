@@ -19,6 +19,7 @@
             <li class="flex items-center space-x-4 bg-gray-50 p-4 rounded-lg dark:bg-gray-700">
                 <div class="flex gap-x-5 items-center">
     
+                    <a href="/profile/{{friend.name}}">
                     {% if friend.image %}
                     <img src="{{ friend.image }}" class="w-16 h-16 rounded-full object-cover" alt="Pending Req User">
                    
@@ -26,6 +27,7 @@
                     <div class="text-gray-500 dark:text-gray-300">No profile picture</div>
                     {% endif %}
                     <p class="text-lg font-semibold text-gray-700 dark:text-white">{{ friend.name }}</p>
+                </a>
 
             
                 </div>
@@ -63,16 +65,19 @@
         {% if received_reqs %}
         <ul class="space-y-4">
             {% for r in received_reqs %}
+            <div>{{forloop.counter}}</div>
             <li class="flex items-center space-x-4 bg-gray-50 p-4 rounded-lg dark:bg-gray-700">
                 <div class="flex gap-x-5 items-center">
     
                     {% if r.image %}
+                    <a href="/profile/{{r.sender}}">
                     <img src="{{ r.image }}" class="w-16 h-16 rounded-full object-cover" alt="Pending Req User">
                    
                     {% else %}
                     <div class="text-gray-500 dark:text-gray-300">No profile picture</div>
                     {% endif %}
                     <p class="text-lg font-semibold text-gray-700 dark:text-white">{{ r.sender }}</p>
+                    </a>
 
             
                 </div>
@@ -109,11 +114,13 @@
                 <div class="flex gap-x-5 items-center">
     
                     {% if r.image %}
+                    <a href="/profile/{{r.receiver}}">
                     <img src="{{ r.image }}" class="w-16 h-16 rounded-full object-cover" alt="Pending Req User">
                     {% else %}
                     <div class="text-gray-500 dark:text-gray-300">No profile picture</div>
                     {% endif %}
                     <p class="text-lg font-semibold text-gray-700 dark:text-white">{{ r.receiver }}</p>
+                    </a>
                 </div>
                 <div>
                     <form action="{% url 'cancel_request' %}" method="POST">

@@ -98,9 +98,9 @@
                         <a href="/profile" data-popover-target="popover-bottom" data-popover-placement="bottom"
                             type="button"
                             class="block py-2 px-3 md:p-0 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white">
-                            {% if profile_image_url %}
-                            <img src="{{ profile_image_url }}" alt="Hi"
-                                class="rounded-full border h-12 w-12 mb-1 object-cover">
+                            {% if admin_info.admin_profile_image %}
+                            <img src="{{ admin_info.admin_profile_image }}" alt="Hi"
+                                class="rounded-full h-12 w-12 mb-1 object-cover">
                             {% else %}
                             <svg class="w-8 h-8 text-gray-500 dark:text-gray-400" aria-hidden="true"
                                 xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
@@ -139,84 +139,279 @@
 
     </div>
 
+    {% comment %} Search Div and Navbar {% endcomment %}
 
 
+    <div class="mt-20 bg-center bg-no-repeat dark:bg-gray-900 bg-[url('https://flowbite.s3.amazonaws.com/docs/jumbotron/hero-pattern.svg')] dark:bg-[url('https://flowbite.s3.amazonaws.com/docs/jumbotron/hero-pattern-dark.svg')] bg-blend-multiply ">
+   
 
-    <div class="bg-gray-200 mx-20 h-full flex flex-col justify-end items-center mt-20">
-
-
-
-
-
-
-        <div class="max-w-sm rounded-lg dark:bg-gray-800 dark:border-gray-700">
+        <div class="grid grid-cols-12">
+        <section class="col-span-6 flex flex-col justify-start items-center mt-20 bg-center  bg-blend-multiply">
             <a href="#">
-                <img class="rounded-full h-56 w-56" src="{{ profile_info.profile_image }}" alt="" />
-            </a>
+                <img class="rounded-full w-40 h-40 sm:w-56 sm:h-56 md:w-96 md:h-96 object-cover" src="{{ profile_info.profile_image }}" alt="" />
+    
+            </a>   
+     
+        </section>
+       
+            <div class="col-span-6 px-4   text-start py-24 lg:py-56">
+                <h1 class="mb-4 text-4xl font-extrabold tracking-tight leading-none text-blue-600 md:text-5xl lg:text-6xl">{{profile_info.profile_name }}</h1>
+                <p class="mb-8 text-lg font-normal text-gray-400 lg:text-xl  text-start">Official {{profile_info.profile_name }}</p>
+                {% if not request.user.is_authenticated %}
+                
+                 {% comment %} if user itself is there then render the profile changing UI  {% endcomment %}
+                <form method="POST" enctype="multipart/form-data" class="border border-red-500" action="{% url 'profile' %}">
+                    {% csrf_token %}
+                    <input type="file" name="profilepic" id="profilepic" class="border border-gray-300 rounded-md p-1">
+                    <button type="submit" class="text-center text-gray-900 bg-gray-300 hover:bg-gray-500 hover:text-white focus:ring-4 focus:outline-none focus:ring-gray-100 font-medium rounded-lg text-sm">
+                        Change
+                        </button>
+                </form>
 
+                {% comment %} if user is not there it means someone is searching there profile..
+                based on the friendship render the logic of unfriending and add friend.. and as well as if the req is sent but acceptance is not there just write friend req sent... {% endcomment %}
+    
+                {% else %}
 
-        </div>
-        <div class="p-5">
-            <a href="" class="text-center">
-                <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
-
-                    {{profile_info.profile_name }}</h5>
-            </a>
-
-            <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">Official Rohit Sharma</p>
-
-            {% if request.user.is_authenticated %}
-
-            <form id="sendRequestForm" action="{% url 'send_request' profile_info.profile_name %}" method="POST">
-                {% csrf_token %}
-                <button type="submit"
-                    class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 gap-x-3">
-                    Add Friend
-                    <i class="fa-solid fa-user-plus"></i>
-                </button>
-            </form>
-
-            {% endif %}
-
+                
+                {% if profile_info.profile_name in my_friends %}
+    <form action="{% url 'unfriend' %}" method="POST">
+        <input type="text" name="unfriend" class="hidden" value="{{ profile_info.profile_name }}">
+        {% csrf_token %}
+        <button type="submit" class="flex gap-x-1 focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900">
+            Unfriend
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+    </form>
+{% else %}
+    <form id="sendRequestForm" action="{% url 'send_request' profile_info.profile_name %}" method="POST">
+        {% csrf_token %}
+        <button type="submit" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 gap-x-3">
+            Add Friend
+            <i class="fa-solid fa-user-plus"></i>
+        </button>
+    </form>
+{% endif %}
 
             
-            {% if messages %}
-            {% for message in messages %}
-            {% if 'req_sent' in message.tags %}
-
-            <div id="toast-danger"
-                class="flex items-center w-full max-w-xs p-4 mb-4 text-gray-500 bg-white rounded-lg shadow dark:text-gray-400 dark:bg-gray-800"
-                role="alert">
-                <div
-                    class="inline-flex items-center justify-center flex-shrink-0 w-8 h-8 text-red-500 bg-red-100 rounded-lg dark:bg-red-800 dark:text-red-200">
-                    <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                        fill="currentColor" viewBox="0 0 20 20">
-                        <path
-                            d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 11.793a1 1 0 1 1-1.414 1.414L10 11.414l-2.293 2.293a1 1 0 0 1-1.414-1.414L8.586 10 6.293 7.707a1 1 0 0 1 1.414-1.414L10 8.586l2.293-2.293a1 1 0 0 1 1.414 1.414L11.414 10l2.293 2.293Z" />
-                    </svg>
-                    <span class="sr-only">Error icon</span>
-                </div>
-                <div class="ms-3 text-sm font-normal">Friend Req Sent.</div>
-                <button type="button"
-                    class="ms-auto -mx-1.5 -my-1.5 bg-white text-gray-400 hover:text-gray-900 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 hover:bg-gray-100 inline-flex items-center justify-center h-8 w-8 dark:text-gray-500 dark:hover:text-white dark:bg-gray-800 dark:hover:bg-gray-700"
-                    data-dismiss-target="#toast-danger" aria-label="Close">
-                    <span class="sr-only">Close</span>
-                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                        fill="none" viewBox="0 0 14 14">
-                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                            stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
-                    </svg>
-                </button>
+                    
+             
+            {% endif %}
             </div>
-            {% endif %}
-            {% endfor %}
-
-            {% endif %}
-
-
-        </div>
+     
+    </div>
     </div>
 
+
+
+
+    <div class="w-full grid grid-cols-12 justify-center">
+        <div class="col-span-3 sm:col-span-3 lg:col-span-2"></div>
+    
+    
+        <!-- sub box -->
+        <div class="col-span-12 sm:col-span-9 lg:col-span-7">
+    
+        
+    
+    
+            {% if posts %}
+            {% for post in posts %}
+            <div class="mx-2 lg:mx-28 lg:mr-10 my-5 bg-white rounded-lg hover:cursor-pointer">
+                <div class="flex justify-between items-center">
+                    <div class="flex items-center p-2">
+                        {% if profile_image_url %}
+                        <img src="{{ profile_image_url }}" alt="Hi" class="rounded-full h-12 w-12 mb-1 object-cover">
+                        {% else %}
+                        <svg class="w-8 h-8 text-gray-500 dark:text-gray-400" aria-hidden="true"
+                            xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                            <path
+                                d="M10 0a10 10 0 1 0 10 10A10.011 10.011 0 0 0 10 0Zm0 5a3 3 0 1 1 0 6 3 3 0 0 1 0-6Zm0 13a8.949 8.949 0 0 1-4.951-1.488A3.987 3.987 0 0 1 9 13h2a3.987 3.987 0 0 1 3.951 3.512A8.949 8.949 0 0 1 10 18Z" />
+                        </svg>
+    
+                        {% endif %}
+                        <div class="gap-y-3">
+                        <h1 class="ms-2 font-semibold text-lg">{{post.user.username}}</h1>
+                        {% if post.created_at  %}
+                           
+                        <input type="text" class="time-posted text-sm text-gray-600 ps-2 border-none outline-none w-10" value='{{ post.created_at|timesince }}' disabled/>.
+                    
+                            <i class="fa-duotone fa-solid fa-earth-americas p-0" style="--fa-primary-color: #898888; --fa-secondary-color: #fffafa;"></i>
+                 
+                          
+                        {% endif %}
+                        </div>
+                    </div>
+                    <div class="relative inline-block text-left">
+                        <div>
+                            <button type="button" id="dropdownButton-{{ forloop.counter }}"
+                                class="flex items-center justify-center w-full p-2 text-gray-500 hover:text-gray-700 focus:outline-none">
+                                <i class="fa-solid fa-ellipsis-vertical text-lg"></i>
+                            </button>
+                        </div>
+                        <div id="dropdownMenu-{{ forloop.counter }}"
+                            class="hidden absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+                            <div class="py-1" role="menu" aria-orientation="vertical"
+                                aria-labelledby="dropdownButton-{{ forloop.counter }}">
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                    role="menuitem">Share</a>
+                                <a href="/edit/{{post.id}}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                    role="menuitem">Edit</a>
+                                <a href="/delete/{{post.id}}"
+                                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                    role="menuitem">Delete</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- post content -->
+                <div class="flex flex-col">
+                    <p class="text-base mt-1 p-3">{{ post.caption }}</p>
+                    {% if post.image_url %}
+                    <img src="{{ post.image_url }}" alt="Post Image" class="mt-1 mb-5 w-full object-cover">
+    
+    
+                    
+                    {% if post.like_count > 0 or post.comment_count > 0 %}
+                    <div class="flex justify-start ms-5 items-center gap-x-9">
+                        <span>{{ post.like_count }} <i class="fa-regular fa-thumbs-up text-blue-600"></i></span>
+                        <span>{{ post.comment_count }} <i class="fa-regular fa-comment text-gray-500"></i></span>
+                    </div>
+                {% endif %}
+                
+    
+                    <hr class="h-px mb-5 bg-gray-200 border-0 dark:bg-gray-700">
+    
+                    <div class="flex flex-col my-2">
+    
+                        <div class="flex justify-around items-center ">
+                            <div class="px-2 py-0.5 flex gap-2 items-center font-semibold hover:bg-zinc-200">
+            
+    
+                                </form method="POST"> 
+              
+                               <a href="{% url 'like_post' post.id %}" class="{% if post.user_has_liked %}text-blue-500{% else %}text-gray-500{% endif %}">
+                              
+                                
+                            
+                                    
+                                <i class="fa-regular fa-thumbs-up text-2xl {% if post.user_has_liked %}text-blue-500{% else %}text-gray-500{% endif %}"></i>
+                                Like
+                               </a>
+                            </div>
+    
+    
+                        
+                            <div class="px-2 py-0.5 flex gap-2 items-center font-semibold hover:bg-zinc-200">
+                                <i class="fa-regular fa-comment text-2xl text-gray-500"></i>Comment
+                            </div>
+                            <div class="px-2 py-0.5 flex gap-2 items-center font-semibold hover:bg-zinc-200">
+                                <i class="fa-solid fa-share text-2xl text-gray-500"></i>Share
+                            </div>
+                        </div>
+    
+                        <!-- comment section -->
+                        <div class="flex flex-col gap-1 p-2 ">
+
+                            {% for comment in post.comments %}
+                            <div class="flex flex-col my-3 mx-5 ">
+    
+    
+                                <div class="comment shadow p-1">
+    
+                                    <div class="flex items-center gap-x-1 p-1">
+                                        {% if comment.user.profile.profile_picture %}
+                                        <img src="data:image/png;base64,{{ comment.user.profile.profile_picture }}" alt="Hi"
+                                            class="rounded-full h-8 w-8  object-cover">
+                                        {% else %}
+                                        <svg class="w-8 h-8 text-gray-500 dark:text-gray-400" aria-hidden="true"
+                                            xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                                            <path
+                                                d="M10 0a10 10 0 1 0 10 10A10.011 10.011 0 0 0 10 0Zm0 5a3 3 0 1 1 0 6 3 3 0 0 1 0-6Zm0 13a8.949 8.949 0 0 1-4.951-1.488A3.987 3.987 0 0 1 9 13h2a3.987 3.987 0 0 1 3.951 3.512A8.949 8.949 0 0 1 10 18Z" />
+                                        </svg>
+    
+                                        {% endif %}
+                                        <span class="font-semibold text-sm">{{ comment.user.username }}</span>
+                                    </div>
+    
+                                    <div class="flex justify-between">
+                                        <p class="bg-zinc-100 text-gray-900 px-2 py-1 ms-8 rounded-lg">{{comment.content}}</p>
+    
+    
+    
+                                        {% if request.user == post.user or request.user == comment.user %}
+                                      
+                                        
+                                      <form action="{% url 'delete_comment' post.id comment.id %}" method="POST">
+                                            {% csrf_token %}
+                                            <button type="submit"
+                                                class="font-bold py-1 px-2 rounded-lg my-1 text-red-300 hover:text-red-500 text-lg">
+                                                <i class="fa-solid fa-trash"></i>
+                                            </button>
+                                        </form>
+                                        {% endif %} 
+    
+                                    </div>
+                                 
+                                </div>
+                            </div>
+                            {% endfor %}
+
+                            <!-- comment form -->
+
+                            <div class="flex items-start">
+                                
+                                {% if admin_info.admin_profile_image %}
+                                <div class="flex items-center gap-x-2">
+                                <img src="{{ admin_info.admin_profile_image }}" alt="Hi"
+                                class="rounded-full  h-12 w-12 mb-1 object-cover">
+                                </div>
+                                {% else %}
+                                <svg class="w-8 h-8 text-gray-500 dark:text-gray-400" aria-hidden="true"
+                                xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                                <path
+                                    d="M10 0a10 10 0 1 0 10 10A10.011 10.011 0 0 0 10 0Zm0 5a3 3 0 1 1 0 6 3 3 0 0 1 0-6Zm0 13a8.949 8.949 0 0 1-4.951-1.488A3.987 3.987 0 0 1 9 13h2a3.987 3.987 0 0 1 3.951 3.512A8.949 8.949 0 0 1 10 18Z" />
+                            </svg>
+                                {% endif %}
+                                    
+
+
+                           
+                
+                                <form method="POST" action="{% url 'add_comment' post.id %}" enctype="multipart/form-data"
+                                class="w-full bg-zinc-100 outline-none rounded-b-xl m-2 flex flex-col shadow-md" id="comment_form">
+                                {% csrf_token %}
+                                <textarea name="comment_text" placeholder="Write a comment" class="w-full p-2 bg-zinc-100 outline-none rounded-b-xl"
+                                    id="comment"></textarea>
+                        
+                                <button type="submit" class="flex justify-end font-bold px-6 py-0.5 text-blue-500 text-xl" id="submit_comment">
+                                    <i class="fa-solid fa-right-long" id="icon"></i>
+                                </button>
+        
+                            </form> 
+                        </div>
+                        </div>
+    
+                        <!-- comment section end -->
+
+                    </div>
+    
+                    {% endif %}
+                </div>
+    
+                <!-- post content -->
+            </div>
+            {% endfor %}
+            {% else %}
+            <h3 class="">No Posts Found</h3>
+            {% endif %}
+    
+        </div>
+    
+    
+    </div>
 
     <script>
         document.getElementById('navbar-toggle').addEventListener('click', function () {
@@ -299,6 +494,43 @@
                 }
             });
         });
+
+
+
+
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const postTimeElements = document.querySelectorAll('.time-posted');
+        
+            postTimeElements.forEach(function(postTimeElement) {
+                const postTime = postTimeElement.value;
+                const timeArray = parseDuration(postTime);
+        
+                if (timeArray[1] === "days") {
+                    postTimeElement.value = `${timeArray[0]}d`;
+                } else if (timeArray[1] === "hour" || timeArray[1]==="hours") {
+                    postTimeElement.value = `${timeArray[0]}h`;
+                } else if (timeArray[1] === "minutes" || "minute") {
+                    postTimeElement.value = `${timeArray[0]}m`;
+                }
+                else if(timeArray[1] === "week" || timeArray[1]==='weeks'){
+                    postTimeElement.value=`${timeArray[0]}w`
+                }
+            });
+        });
+        
+        function parseDuration(duration) {
+            const regex = /(\d+)\s(\w+)/g;
+            let match;
+            const result = [];
+        
+            while ((match = regex.exec(duration)) !== null) {
+                result.push(match[1], match[2]);
+            }
+        
+            return result;
+        }
+        
 
 
 

@@ -1,0 +1,27 @@
+I have resolved the friend req logic error. 
+
+As of now, I don't have any bugs in this code.
+However, they might show up you never know.
+
+
+
+I have created this txt file so that I can understand what next to be done with this product I am building.
+
+--> Redesign the profile Url
+-- solved the comment deleting logic raised and profile picture of the commeter
+
+--> logical reasoning on friend req sent. For eg, If I search a name, and that person is already a friend of mine. Then it 
+should be unfriend option. and message option. If not, then add friend is already there.
+
+=logical reasoning is done, but the option of message is I will do it later when the messenger functionality starts
+
+--> Important messaging features for that I need to learn for sure.
+
+--> Front UI on the sides.
+
+--> Profile.html Comment and date time of the Post.
+=done
+
+--> On top of friends, If we have any pending req then the counter should be there otherwise no need of the counter.
+==done
+

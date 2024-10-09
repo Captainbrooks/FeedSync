@@ -4,13 +4,6 @@ from django.contrib.auth.models import User
 # Create your models here.
 
 
-
-
-
- 
-
-
-
 class Posts(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     caption=models.CharField(max_length=1000)
@@ -25,14 +18,7 @@ class Posts(models.Model):
     def get_comment_count(self):
         return Comment.objects.filter(post=self).count()
     
-    
  
-
-        
-    
-    
-    
-    
 class Profile(models.Model):
     user=models.OneToOneField(User,on_delete=models.CASCADE)
     cover_picture=models.TextField(User,null=True, blank=True)
