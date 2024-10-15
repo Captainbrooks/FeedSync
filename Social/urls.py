@@ -15,7 +15,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, re_path, include
 from FeedSync.views import *
 
 urlpatterns = [
@@ -26,7 +26,8 @@ urlpatterns = [
     
     path('feed/',feed,name="feed"),
     
-    path('messenger/',messenger,name="messenger"),
+    path('messenger/', messenger, name="messenger"),
+  
     
     path('profile/',profile,name="profile"),
     path('friends/',friends,name="friends"),

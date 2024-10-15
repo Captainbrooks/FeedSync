@@ -22,7 +22,7 @@ def image_to_base64(image_path):
 # To convert the base64 string into the actual image so that we can display the real image in the UI
 
 def base64_to_image(base64_string):
-   return f"data:image/png;base64,{base64_string}"
+    return f"data:image/png;base64,{base64_string}"
 
 
 def base(admin):
@@ -42,7 +42,7 @@ def base(admin):
 def index(request):
     user = request.user
     
-   # getting the friends of the current logged in user where friendship exists no matter if the req was sent by user or received by user
+    #getting the friends of the current logged in user where friendship exists no matter if the req was sent by user or received by user
     friends_with = Friendship.objects.filter(
         Q(sender=user) | Q(receiver=user), 
         accepted=True)
@@ -123,8 +123,8 @@ def index(request):
         trim_caption=caption.strip()
         
         if not trim_caption:
-             messages.error(request, "Caption cannot be spaces only.Please enter a caption")
-             return redirect("/index")
+            messages.error(request, "Caption cannot be spaces only.Please enter a caption")
+            return redirect("/index")
                
         file=request.FILES.get('image')
         if file:
@@ -219,17 +219,42 @@ def feed(request):
     return render("feed.html")
 
 @login_required(login_url="/login")
-def messenger(request):
+def messenger(request,username=None):
     
     user=request.user
-     # Retrieve the profile image URL for the current user
+    # Retrieve the profile image URL for the current user
     profile = Profile.objects.filter(user=user).first()
     profile_image_url = base64_to_image(profile.profile_picture) if profile and profile.profile_picture else None
     
+    
+    friends_with = Friendship.objects.filter(
+        Q(sender=user) | Q(receiver=user), 
+        accepted=True)
+    
+    
+    my_friends=[]
+    
+    for f in friends_with:
+        friend = f.sender if f.sender != user else f.receiver
+        profile = Profile.objects.filter(user=friend).first()
+        my_friends.append({
+            'name': friend.username,
+            'image': base64_to_image(profile.profile_picture) if profile.profile_picture else None
+        })
+    
+    
+    
     context={
         'profile_image_url': profile_image_url,
+        'my_friends':my_friends,
+        'user':user
     }
     return render(request, "messenger.html",context)
+
+
+
+
+
 
 
 @login_required(login_url="/login")
