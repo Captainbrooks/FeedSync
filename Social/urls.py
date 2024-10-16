@@ -19,6 +19,8 @@ from django.urls import path, re_path, include
 from FeedSync.views import *
 
 urlpatterns = [
+    
+     path('admin/', admin.site.urls),
     path('', index, name="index"),
     path('index/', index , name="index"),
     path('login/',login_page,name="login_page"),
@@ -44,5 +46,5 @@ urlpatterns = [
     path('cancel_request/', cancel_request, name='cancel_request'),
     path('unfriend/', unfriend, name='unfriend'),
     path('logout/',logout_page,name="logout_page"),
-    path('admin/', admin.site.urls),
+   
 ]
