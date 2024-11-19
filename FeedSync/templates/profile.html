@@ -1,0 +1,844 @@
+{% extends "base.html" %}
+
+{% block start %}
+
+
+
+
+
+
+
+<div class="mt-32 sm:mt-20  bg-center bg-no-repeat  bg-[url('https://flowbite.s3.amazonaws.com/docs/jumbotron/hero-pattern.svg')]  bg-blend-multiply ">
+
+ 
+
+    <div class="flex flex-col items-center pb-10">
+
+        {% if profile_image_url %}
+        <a href="/profile">
+            <img class="rounded-full w-40 h-40 sm:w-56 sm:h-56 md:w-96 md:h-96 object-cover"
+                src="{{ profile_image_url }}" alt="" />
+        </a>
+        {% else %}
+        <svg class="w-40 h-40 mr-4 text-gray-500 " aria-hidden="true"
+            xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+            <path
+                d="M10 0a10 10 0 1 0 10 10A10.011 10.011 0 0 0 10 0Zm0 5a3 3 0 1 1 0 6 3 3 0 0 1 0-6Zm0 13a8.949 8.949 0 0 1-4.951-1.488A3.987 3.987 0 0 1 9 13h2a3.987 3.987 0 0 1 3.951 3.512A8.949 8.949 0 0 1 10 18Z" />
+        </svg>
+        {% endif %}
+
+        
+        {% if profile_image_url %}
+        <a href="/deleteprofile" class="flex items-center p-0.5 bg-red-500 my-2 text-white font-medium rounded-lg border-2 border-red-600 hover:bg-red-600 transition duration-200">
+            <i class="fas fa-trash-alt mr-2"></i> <!-- Font Awesome trash icon -->
+            Delete Profile Picture
+        </a>
+        
+        {% endif %}
+            
+
+
+
+        <h1 class="my-3 text-2xl font-bold text-gray-900 ">{{request.user.username}}</h1>
+        <span class="text-sm text-gray-500 ">Official {{request.user.username}}</span>
+
+        {% if request.user.is_authenticated %}
+
+
+        <form method="POST" enctype="multipart/form-data" action="{% url 'profile' %}" class="flex flex-col space-y-4">
+            {% csrf_token %}
+
+
+            <input type="file" name="profilepic" id="profilepic"
+                class="border border-gray-300 rounded-md p-2 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200"
+                onchange="previewImage(event)">
+
+
+            <div class="flex justify-center">
+                <img id="imagePreview" class="w-32 h-32 object-cover  border border-gray-300" alt="Your Profile">
+            </div>
+
+
+            <button type="submit"
+                class="w-full py-2 text-center text-white bg-blue-500 hover:bg-blue-600 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-md text-sm">
+                Change
+            </button>
+        </form>
+
+        {% else %}
+
+
+
+
+        <div class="flex mt-4 md:mt-6">
+            <form id="sendRequestForm" action="{% url 'send_request' request.user.username %}" method="POST">
+                {% csrf_token %}
+                <button type="submit"
+                    class="inline-flex items-center px-4 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                    Add Friend
+                    <i class="ml-2 fa-solid fa-user-plus"></i>
+                </button>
+            </form>
+            <a href="/messenger"
+                class="py-2 px-4 ms-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">Message
+                <i class="ml-2 fa-solid fa-message"></i>
+            </a>
+            {% endif %}
+
+
+        </div>
+
+
+    </div>
+</div>
+
+
+<!-- intro  -->
+
+
+
+
+
+
+<!-- sidebar -->
+
+
+
+
+
+
+
+
+
+<div class="grid grid-cols-12">
+
+    <div class="hidden lg:block col-span-4 p-2">
+
+
+        <aside id="default-sidebar w-full"
+            class="hidden lg:block sticky top-24 w-full transition-transform -translate-x-full sm:translate-x-0"
+            aria-label="Sidebar">
+            <div class="rounded-md mt-16">
+                <div class="bg-gray-100 py-2 px-2">
+                    {% if my_friends %}
+                    <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900">Friends</h5>
+                </div>
+
+                {% for friend in my_friends %}
+                <ul class="divide-y divide-gray-200">
+                    <a href="/profile/{{friend.name}}">
+                        <li class="flex items-center py-1 px-6 hover:bg-slate-300 hover:cursor-pointer border-r-2">
+
+                            {% if friend.image %}
+
+
+                            <img class="w-12 h-12 rounded-full object-cover mr-4" src="{{friend.image}}"
+                                alt="User avatar">
+
+                            {% else %}
+
+                            <svg class="w-12 h-12 mr-4 text-gray-500" aria-hidden="true"
+                                xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                                <path
+                                    d="M10 0a10 10 0 1 0 10 10A10.011 10.011 0 0 0 10 0Zm0 5a3 3 0 1 1 0 6 3 3 0 0 1 0-6Zm0 13a8.949 8.949 0 0 1-4.951-1.488A3.987 3.987 0 0 1 9 13h2a3.987 3.987 0 0 1 3.951 3.512A8.949 8.949 0 0 1 10 18Z" />
+                            </svg>
+
+                            {% endif %}
+
+                            <div class="flex-1">
+                                <h3 class="text-lg font-medium text-gray-800"></h3>
+                                <p class="text-gray-600 text-base">{{friend.name}}</p>
+                            </div>
+
+
+                        </li>
+                    </a>
+                    {% endfor %}
+
+                    {% else %}
+
+                    <div class="flex p-10">
+                        <h3 class="text-lg font-semibold text-gray-600">No Friends Found</h3>
+                    </div>
+
+                    {% endif %}
+                </ul>
+            </div>
+
+
+
+
+
+
+            <!-- post photos -->
+            <div class="flex flex-col bottom-64">
+              
+                <a href="#">
+                    <h5 class="mt-4 mb-2 text-2xl font-bold tracking-tight text-gray-900">Photos</h5>
+                </a>
+                <div class="flex flex-wrap space-x-1 space-y-1">
+                    {% if posts %}
+                    {% for post in posts %}
+
+                    
+                
+                        
+                    <div class="flex">
+                        {% if post.image_url %}
+                      
+                            <img class="w-32 h-32 object-cover rounded-lg cursor-pointer" src="{{ post.image_url }}" alt="" />
+                       
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="flex p-10">
+                    <h3 class="text-lg font-semibold text-gray-600">No Photos Found</h3>
+                </div>
+                {% endif %}
+            </div>
+            
+        </aside>
+
+    </div>
+
+
+    <!-- sub box -->
+   
+   <div class="col-span-12 lg:col-span-8 p-2">
+
+
+    
+
+
+
+
+            {% if posts %}
+            {% for post in posts %}
+            <div class="mx-2 lg:mx-28 lg:mr-10 my-5 bg-white rounded-lg hover:cursor-pointer">
+                <div class="flex justify-between items-center">
+                    <div class="flex items-center p-2">
+                        {% if profile_image_url %}
+                        <img src="{{ profile_image_url }}" alt="Hi" class="rounded-full h-12 w-12 mb-1 object-cover">
+                        {% else %}
+                        <svg class="w-8 h-8 text-gray-500" aria-hidden="true"
+                            xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                            <path
+                                d="M10 0a10 10 0 1 0 10 10A10.011 10.011 0 0 0 10 0Zm0 5a3 3 0 1 1 0 6 3 3 0 0 1 0-6Zm0 13a8.949 8.949 0 0 1-4.951-1.488A3.987 3.987 0 0 1 9 13h2a3.987 3.987 0 0 1 3.951 3.512A8.949 8.949 0 0 1 10 18Z" />
+                        </svg>
+
+                        {% endif %}
+                        <div class="gap-y-3">
+                            <h1 class="ms-2 font-semibold text-lg">{{post.user.username}}</h1>
+                            {% if post.created_at %}
+
+                            <input type="text"
+                                class="time-posted text-sm text-gray-600 ps-2 border-none outline-none w-1/2"
+                                value='{{ post.created_at|timesince }}' disabled />.
+
+                            <i class="fa-duotone fa-solid fa-earth-americas p-0"
+                                style="--fa-primary-color: #898888; --fa-secondary-color: #fffafa;"></i>
+
+
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="relative inline-block text-left">
+                        <div>
+                            <button type="button" id="dropdownButton-{{ forloop.counter }}"
+                                class="flex items-center justify-center w-full p-2 text-gray-500 hover:text-gray-700 focus:outline-none">
+                                <i class="fa-solid fa-ellipsis-vertical text-lg"></i>
+                            </button>
+                        </div>
+                        <div id="dropdownMenu-{{ forloop.counter }}"
+                            class="hidden absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+                            <div class="py-1" role="menu" aria-orientation="vertical"
+                                aria-labelledby="dropdownButton-{{ forloop.counter }}">
+
+
+                                {% if not request.user == post.user %}
+
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                    role="menuitem">Report</a>
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                    role="menuitem">Share</a>
+
+
+                                {% else %}
+
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                    role="menuitem">Share</a>
+
+                                {% endif %}
+
+                                {% if request.user == post.user %}
+                                <a href="/updatePost/{{post.id}}"
+                                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                    role="menuitem">Edit</a>
+                                <a href="/deletePost/{{post.id}}"
+                                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                    role="menuitem">Delete</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- post content -->
+                <div class="flex flex-col">
+                    <p class="text-base mt-1 p-3">{{ post.caption }}</p>
+                 
+                    
+                    {% if post.image_url %}
+                        
+                 
+                    <img src="{{ post.image_url }}" alt="Post Image" class="mt-1 mb-5 w-full object-cover">
+                        
+                    {% endif %}
+                        
+                    
+
+
+
+                    <div class="flex justify-start ms-5 items-center gap-x-9">
+                        <span class="like-count" data-post-id="{{ post.id }}">
+                            <i class="fa-regular fa-thumbs-up text-blue-600"></i> {{ post.like_count }}
+                        </span>
+
+                        <span class="comment-count" data-post-id="{{post.id}}"><i
+                                class="fa-regular fa-comment text-gray-500"></i>{{ post.comment_count }} 
+                            </span>
+                    </div>
+
+
+                    <hr class="h-px mb-5 bg-gray-200 border-0">
+
+                    <div class="flex flex-col my-2">
+
+                        <div class="flex justify-around items-center ">
+         <!-- Like -->
+         <div class="px-2 py-0.5 flex gap-2 items-center font-semibold hover:bg-zinc-200">
+            <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+
+            <button data-post-id="{{ post.id }}"
+                class="like-btn {% if post.user_has_liked %}text-blue-500{% else %}text-gray-500{% endif %}"
+                data-liked="{{ post.user_has_liked }}">
+                <i class="fa-regular fa-thumbs-up text-2xl me-2"></i>Like
+            </button>
+        </div>
+
+        <audio id="like-sound" src="..\static\sound\likesound.wav" preload="auto"></audio>
+        <!-- Like end -->
+
+
+
+                            <div class="px-2 py-0.5 flex gap-2 items-center font-semibold hover:bg-zinc-200">
+                                <i class="fa-regular fa-comment text-2xl text-gray-500"></i>Comment
+                            </div>
+
+                            <audio id="comment-sound" src="\static\sound\comment.mp3" preload="auto"></audio>
+
+                            <div class="px-2 py-0.5 flex gap-2 items-center font-semibold hover:bg-zinc-200">
+                                <i class="fa-solid fa-share text-2xl text-gray-500"></i>Share
+                            </div>
+                        </div>
+
+                        <!-- comment section -->
+                        <div class="flex flex-col gap-1 p-2 ">
+
+                   
+                            <div id="comments-section-{{ post.id }}" class="flex flex-col my-3 mx-5 ">
+                                {% for comment in post.comments %}
+                         
+
+
+                                <div class="comment shadow p-1">
+
+                                    <div class="flex items-center gap-x-1 p-1">
+                                        {% if comment.user.profile.profile_picture %}
+                                        <img src="data:image/png;base64,{{ comment.user.profile.profile_picture }}"
+                                            alt="Hi" class="rounded-full h-8 w-8  object-cover">
+                                        {% else %}
+                                        <svg class="w-8 h-8 text-gray-500" aria-hidden="true"
+                                            xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                                            <path
+                                                d="M10 0a10 10 0 1 0 10 10A10.011 10.011 0 0 0 10 0Zm0 5a3 3 0 1 1 0 6 3 3 0 0 1 0-6Zm0 13a8.949 8.949 0 0 1-4.951-1.488A3.987 3.987 0 0 1 9 13h2a3.987 3.987 0 0 1 3.951 3.512A8.949 8.949 0 0 1 10 18Z" />
+                                        </svg>
+
+                                        {% endif %}
+                                        <span class="font-semibold text-sm">{{ comment.user.username }}</span>
+                                    </div>
+
+                                    <div class="flex justify-between">
+                                        <p class="bg-zinc-100 text-gray-900 px-2 py-1 ms-8 rounded-lg">
+                                            {{comment.content}}</p>
+
+
+
+                                            {% if request.user == post.user or request.user == comment.user %}
+                                            <button type="button"
+                                                class="delete-comment-btn font-bold py-1 px-2 rounded-lg my-1 text-red-300 hover:text-red-500 text-lg"
+                                                data-comment-id="{{ comment.id }}"
+                                                data-post-id="{{ post.id }}">
+                                                <i class="fa-solid fa-trash"></i>
+                                            </button>
+                                            {% endif %}
+
+                                    </div>
+
+                                </div>
+                                {% endfor %}
+
+                            </div>
+
+                            <!-- comment form -->
+
+                            <div class="flex items-start">
+
+                                {% if profile_image_url %}
+                                <div class="flex items-center gap-x-2">
+                                    <img src="{{ profile_image_url }}" alt="Hi"
+                                        class="rounded-full  h-12 w-12 mb-1 object-cover">
+                                </div>
+                                {% else %}
+                                <svg class="w-8 h-8 text-gray-500" aria-hidden="true"
+                                    xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                                    <path
+                                        d="M10 0a10 10 0 1 0 10 10A10.011 10.011 0 0 0 10 0Zm0 5a3 3 0 1 1 0 6 3 3 0 0 1 0-6Zm0 13a8.949 8.949 0 0 1-4.951-1.488A3.987 3.987 0 0 1 9 13h2a3.987 3.987 0 0 1 3.951 3.512A8.949 8.949 0 0 1 10 18Z" />
+                                </svg>
+    
+                                {% endif %}
+    
+                             
+                                <form
+                                enctype="multipart/form-data"
+                                class="w-full bg-zinc-100 outline-none rounded-b-xl m-2 flex flex-col shadow-md"
+                                id="comment_form">
+                                {% csrf_token %}
+    
+                                <textarea name="comment_text" placeholder="Write a comment" class="comment_text w-full p-2 bg-zinc-100 outline-none rounded-b-xl"
+                                id="comment_{{post.id}}" data-postcomment-id="{{post.id}}"></textarea>
+    
+                                <button type="button"
+                              
+                                    class="comment-btn flex justify-end font-bold px-6 py-0.5 text-blue-500 text-xl"
+                                      data-postcomment-id="{{post.id}}">
+    
+                                    <i class="fa-solid fa-right-long" id="icon"></i>
+                                </button>
+    
+                            </form>
+                            </div>
+                        </div>
+
+                        <!-- comment section end -->
+
+                    </div>
+
+                  
+                </div>
+
+                <!-- post content -->
+            </div>
+
+
+
+
+
+
+
+
+
+
+            {% endfor %}
+            {% else %}
+
+            <div class="flex flex-col justify-center items-center py-10">
+
+                <h3 class="text-lg font-semibold text-gray-600">No Posts Found</h3>
+            </div>
+            {% endif %}
+
+        </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <script>
+
+
+        const textarea = document.getElementById('post');
+        const submitButton = document.getElementById('post_submit');
+
+        textarea.addEventListener('input', () => {
+            if (textarea.value.trim().length > 0) {
+                submitButton.classList.remove('bg-blue-300');
+                submitButton.classList.add('bg-blue-600');
+            } else {
+                submitButton.classList.remove('bg-blue-600');
+                submitButton.classList.add('bg-blue-300');
+            }
+        });
+
+
+        document.getElementById('file-upload').addEventListener('change', function (event) {
+            const file = event.target.files[0];
+            const preview = document.getElementById('post-image-preview');
+
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    preview.src = e.target.result;
+                    preview.classList.remove('hidden');
+                };
+                reader.readAsDataURL(file);
+            } else {
+                preview.src = '';
+                preview.classList.add('hidden');
+            }
+        });
+
+
+
+
+
+
+
+
+
+
+
+
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const postTimeElements = document.querySelectorAll('.time-posted');
+
+            postTimeElements.forEach(function (postTimeElement) {
+                const postTime = postTimeElement.value;
+                const timeArray = parseDuration(postTime);
+
+                if (timeArray[1] === "days") {
+                    postTimeElement.value = `${timeArray[0]}d`;
+                } else if (timeArray[1] === "hour" || timeArray[1] === "hours") {
+                    postTimeElement.value = `${timeArray[0]}h`;
+                } else if (timeArray[1] === "minutes") {
+                    postTimeElement.value = `${timeArray[0]}m`;
+                }
+                else if (timeArray[1] === "week" || timeArray[1] === 'weeks') {
+                    postTimeElement.value = `${timeArray[0]}w`
+                }
+            });
+        });
+
+        function parseDuration(duration) {
+            const regex = /(\d+)\s(\w+)/g;
+            let match;
+            const result = [];
+
+            while ((match = regex.exec(duration)) !== null) {
+                result.push(match[1], match[2]);
+            }
+
+            return result;
+        }
+
+
+
+
+        function previewImage(event) {
+            const input = event.target;
+            const imagePreview = document.getElementById('imagePreview');
+            const file = input.files[0];
+          
+
+            if (file) {
+                const reader = new FileReader();
+
+                reader.onload = function (e) {
+                    imagePreview.src = e.target.result;
+                };
+
+                reader.readAsDataURL(file);
+            }
+        }
+
+
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const dropdownButtons = document.querySelectorAll('[id^="dropdownButton-"]');
+            dropdownButtons.forEach(button => {
+                button.addEventListener('click', function (event) {
+                    const menuId = this.id.replace('Button', 'Menu');
+                    const dropdownMenu = document.getElementById(menuId);
+                    dropdownMenu.classList.toggle('hidden');
+
+                    // Close the dropdown if the user clicks outside of it
+                    document.addEventListener('click', function (event) {
+                        const isClickInside = button.contains(event.target) || dropdownMenu.contains(event.target);
+                        if (!isClickInside) {
+                            dropdownMenu.classList.add('hidden');
+                        }
+                    });
+                });
+            });
+        });
+
+
+    </script>
+
+
+    <script>
+
+        document.addEventListener('DOMContentLoaded', function()     {               
+
+document.querySelectorAll('.like-btn').forEach(button => {
+
+    button.addEventListener('click', function (event) {
+
+        event.stopPropagation();
+
+      
+       
+
+        const postId = this.getAttribute('data-post-id');
+
+        
+        const url = `/like/${postId}/`;
+        const csrftoken = getCookie('csrftoken');
+
+
+
+        this.setAttribute('disabled', true);
+
+
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrftoken,
+                'Content-Type': 'application/json'
+            },
+            credentials: 'same-origin'
+        })
+            .then(response => response.json())
+            .then(data => {
+
+                const likeCountElement = document.querySelector(`.like-count[data-post-id="${postId}"]`);
+
+                if (data.liked) {
+                    document.getElementById('like-sound').play();
+                    this.setAttribute('data-liked', 'true');
+                    this.classList.add('text-blue-500');
+                    this.classList.remove('text-gray-500');
+                    this.querySelector('i').classList.add('text-blue-500');
+                    this.querySelector('i').classList.remove('text-gray-500');
+                  
+                    
+                }
+                else {
+                    this.setAttribute('data-liked', 'false');
+                    this.classList.add('text-gray-500');
+                    this.classList.remove('text-blue-500');
+                    this.querySelector('i').classList.add('text-gray-500');
+                    this.querySelector('i').classList.remove('text-blue-500');
+
+                }
+
+              
+                    likeCountElement.innerHTML = `<i class="fa-regular fa-thumbs-up text-blue-600"></i> ${data.like_count}`;
+                this.removeAttribute('disabled');
+
+            })
+            .catch(error => console.error('Error:', error));
+
+    })
+})
+
+
+
+
+
+
+
+
+document.querySelectorAll('.comment-btn').forEach(button =>{
+    button.addEventListener('click', function(event){
+        event.preventDefault();
+        event.stopPropagation();
+
+        
+
+        const postId=this.getAttribute('data-postcomment-id');
+        const commentText = document.querySelector(`#comment_${postId}`).value;
+
+       
+
+        const url=`/post/${postId}/add_comment/`;
+        const csrftoken = getCookie('csrftoken');
+
+
+        this.setAttribute('disabled',true);
+
+
+        fetch(url,{
+            method:"POST",
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken
+            },
+            body:JSON.stringify({
+                'comment_text':commentText
+            })
+
+        }).then(response=>response.json())
+        .then(data=>{
+
+            const commentCountElement = document.querySelector(`.comment-count[data-post-id="${postId}"]`);
+
+            if (data.status === 'success') {
+                document.getElementById('comment-sound').play();
+                renderComment(data.comments,postId);
+                document.querySelector(`#comment_${postId}`).value = '';
+                this.removeAttribute('disabled');
+                
+            } else {
+                
+                console.error('Error:', data.message);
+
+            }
+
+            commentCountElement.innerHTML = `<i class="fa-regular fa-comment text-gray-500"></i> ${data.comment_count}`;
+            this.removeAttribute('disabled');
+
+        })
+        .catch(error => console.error('Error:', error));
+
+
+
+
+        function renderComment(comment,postId) {
+            // Create a new comment element
+            const commentContainer = document.createElement('div');
+            commentContainer.className = 'comment shadow p-1';
+        
+            // Construct the delete URL
+            const deleteUrl = `/post/${postId}/${comment.id}/delete_comment/`; // Update this URL as per your URL structure
+        
+            commentContainer.innerHTML = `
+        <div class="flex items-center gap-x-1 p-1">
+            <img src="data:image/png;base64,${comment.profile_picture || ''}" alt="Profile Picture" class="rounded-full h-8 w-8 object-cover">
+            <span class="font-semibold text-sm">${comment.user}</span>
+        </div>
+           <div class="flex justify-between">
+            <p class="bg-zinc-100 text-gray-900 px-2 py-1 ms-8 rounded-lg">${comment.content}</p>
+            <button class="delete-comment-btn font-bold py-1 px-2 rounded-lg my-1 text-red-300 hover:text-red-500 text-lg" 
+                    data-comment-id="${comment.id}" 
+                    data-post-id="${postId}">
+                <i class="fa-solid fa-trash"></i>
+            </button>
+        </div>
+    `;
+        
+            // Append the new comment to the comments section (assumed to have an ID 'comments-section')
+            document.getElementById(`comments-section-${postId}`).appendChild(commentContainer);
+
+            attachDeleteEvent(commentContainer.querySelector('.delete-comment-btn'));
+        }
+
+    })
+})
+
+
+
+
+
+function attachDeleteEvent(button) {
+    button.addEventListener('click', function(event) {
+        event.preventDefault();
+
+        const commentId = this.getAttribute('data-comment-id');
+        const postId = this.getAttribute('data-post-id');
+        const csrftoken = getCookie('csrftoken');
+
+        const url = `/post/${postId}/${commentId}/delete_comment/`; // Adjust URL based on your routing
+
+        fetch(url, {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            const commentCountElement = document.querySelector(`.comment-count[data-post-id="${postId}"]`);
+
+            if (data.status === 'success') {
+              
+                const commentElement = this.closest('.comment'); // Find the closest comment container
+                if (commentElement) {
+                    commentElement.remove(); // Remove the comment element from the DOM
+                }
+            } else {
+                console.error('Error:', data.message);
+            }
+            commentCountElement.innerHTML = `<i class="fa-regular fa-comment text-gray-500"></i> ${data.comment_count}`;
+            this.removeAttribute('disabled');
+        })
+        .catch(error => console.error('Error:', error));
+    });
+}
+
+document.querySelectorAll('.delete-comment-btn').forEach(button => {
+    attachDeleteEvent(button);
+});
+
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+
+
+</script>
+
+
+    {% endblock %}

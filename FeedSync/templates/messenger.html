@@ -1,0 +1,385 @@
+{% extends "base.html" %}
+
+{% block start %}
+
+<style>
+  .message-container {
+      display: flex;
+      flex-direction: column;
+      margin: 10px 0; 
+  }
+
+  .message {
+      padding: 10px 15px; 
+      border-radius: 8px; 
+      max-width: 85%;
+      word-wrap: break-word; 
+      margin-bottom: 5px; 
+      display: flex; 
+      align-items: center; 
+  }
+
+
+
+
+  .message.left {
+      background-color: #f1f1f1;
+      align-self: flex-start; 
+      text-align: left;
+  }
+
+  .message.right {
+      background-color: #cfe9ff;
+      align-self: flex-end; 
+      text-align: left;
+  }
+
+  .clear {
+      clear: both;
+  }
+
+  .friend {
+      transition: background-color 0.3s ease; 
+  }
+
+  .friend:hover {
+      background-color: #e2e8f0; 
+  }
+
+  .friend-image {
+      width: 24px; 
+      height: 24px; 
+      
+      margin-right: 8px; 
+  }
+</style>
+
+<div class="mt-28 m-2 bg-white md:mx-32 h-screen flex flex-col">
+
+    <h1 class="p-5 font-bold text-gray-600 text-2xl">Chats</h1>
+
+    <div class="flex justify-center items-center">
+        <form class="w-1/2 bg-gray-100 rounded-full flex items-center shadow-sm my-1">
+            <input type="search" name="search" placeholder="Search friends"
+                class="flex-grow text-gray-700 bg-gray-100 rounded-l-full border-none focus:outline-none px-4">
+            <button type="submit"
+                class="px-3 py-3 bg-gray-100 rounded-r-full hover:bg-zinc-200 focus:outline-none focus-within:bg-white">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-600" fill="currentColor" viewBox="0 0 50 50">
+                    <path
+                        d="M 21 3 C 11.621094 3 4 10.621094 4 20 C 4 29.378906 11.621094 37 21 37 C 24.710938 37 28.140625 35.804688 30.9375 33.78125 L 44.09375 46.90625 L 46.90625 44.09375 L 33.90625 31.0625 C 36.460938 28.085938 38 24.222656 38 20 C 38 10.621094 30.378906 3 21 3 Z M 21 5 C 29.296875 5 36 11.703125 36 20 C 36 28.296875 29.296875 35 21 35 C 12.703125 35 6 28.296875 6 20 C 6 11.703125 12.703125 5 21 5 Z">
+                    </path>
+                </svg>
+            </button>
+        </form>
+    </div>
+
+    <hr class="mt-4 border-t border-2 border-gray-300">
+
+    <!-- Friend List Scrollable Section -->
+    <div class="flex-grow overflow-y-auto h-full">
+
+        {% if my_friends %}
+        {% for m in my_friends %}
+
+       
+        <div class="friend w-full flex items-center hover:bg-gray-300 p-2 cursor-pointer" 
+             data-name="{{ m.name }}" 
+             data-image="{{ m.image | default:'/static/images/noprofile.png' }}"> <!-- Default profile image if none -->
+
+          <img src="{{ m.image | default:'/static/images/noprofile.png' }}" alt="{{ m.name }}" class="rounded-full h-12 w-12 mb-1 object-cover">
+          
+          <h1 class="ml-4 font-bold" data-name="{{m.name}}">{{ m.name }}</h1>
+
+          <span class="unread-count ml-2 text-sm text-white bg-red-500 rounded-full w-5 h-5 flex items-center justify-center hidden" data-unread-count="0"></span>
+         
+        </div>
+        {% endfor %}
+
+
+        {% else %}
+        <div class="flex justify-center items-center my-5 p-5">
+        <h1 class="text-gray-500 font-medium  text-base md:text-2xl">You have no friends at the moment</h1>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Chat Container -->
+    <div id="chat-container" class="hidden fixed top-10 right-4 w-3/4 sm:w-1/4 md:w-1/4 z-[1000]">
+        <div class="bg-white shadow-md rounded-lg max-w-lg w-full">
+            <div class="p-4 bg-slate-400 text-white rounded-t-lg flex justify-between items-center">
+                <div class="flex items-center gap-x-2">
+                    <img id="friend-image" src="" alt="" class="rounded-full h-12 w-12 mb-1 object-cover">
+                    <h3 id="textfriend" class="text-lg font-semibold"></h3>
+                </div>
+                <button id="close-chat" class="text-gray-300 hover:text-gray-400">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <div id="chatbox" class="p-4 h-80 overflow-y-auto">
+                <!-- Chat messages will be displayed here -->
+            </div>
+
+            <div class="p-4 border-t flex">
+                <textarea class="user-input w-full px-3 py-2 border rounded-l-md focus:outline-none"></textarea>
+                <button class="send-button bg-blue-500 text-white px-4 py-2 rounded-r-md hover:bg-blue-600">Send</button>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+<audio id="new-message" src="\static\sound\newmessage.mp3" preload="auto"></audio>
+<audio id="message-sent" src="\static\sound\messageSent.mp3" preload="auto"></audio>
+
+<script>
+    const chatContainer = document.getElementById("chat-container");
+    const openChatButtons = document.querySelectorAll(".friend");
+    const closeChatButton = document.getElementById("close-chat");
+    const otherUsernameDisplay = document.getElementById("textfriend");
+    const username = "{{ request.user.username }}"; 
+    const userInput = document.querySelector(".user-input");
+    const sendButton = document.querySelector(".send-button");
+    const friendImageElement = document.getElementById("friend-image");
+
+    let socket = null;
+    let isConnected = false; // check if socket exists
+
+    function openChat(friendName, friendImage) {
+        document.getElementById("new-message").play()
+        otherUsernameDisplay.textContent = friendName;
+        friendImageElement.src = friendImage;
+
+
+        document.getElementById("chatbox").innerHTML=`
+        <div class="flex items-center justify-center w-full h-full">
+    <div class="px-3 py-1.5 text-md font-medium leading-none text-center text-white bg-blue-600 rounded-full animate-pulse dark:bg-blue-900 dark:text-blue-200">loading...</div>
+</div>
+        
+        `
+        
+        
+        // Closing the socket if exists
+        if (socket) {
+            socket.close();
+        }
+
+        // Opening a new WebSocket connection
+        socket = new WebSocket(`ws://${window.location.host}/ws/messenger/${username}/${friendName}/`);
+
+        socket.onopen = function() {
+            console.log(`Connected to chat with ${friendName}`);
+            
+        }
+
+        socket.onmessage = function(event) {
+            const data = JSON.parse(event.data);
+         
+
+            if (data.type === 'conversation') {
+                const conversation = data.conversation;
+                const chatbox = document.getElementById('chatbox');
+                chatbox.innerHTML = ""; 
+
+                conversation.forEach(msg => {
+                  
+                    const imgTag = msg.sender !== username ? `<img src="${friendImage || '/static/images/noprofile.png'}" alt="${msg.sender}" class="rounded-full h-10 gap-x-2 w-10 mb-1 object-cover">` : '';
+                    const messageClass = msg.sender === username ? 'right' : 'left';
+                    chatbox.innerHTML += `
+                        <div class="flex flex-col my-5 mx-0 group">
+                              ${imgTag}
+                   <div class="message gap-x-2 pb-4 font-medium ${messageClass}">
+            ${msg.content}
+           
+
+          
+                        </div>
+                          <span class="text-xs my-1 opacity-0 group-hover:opacity-100 text-gray-500 transition-opacity duration-300">
+             ${msg.created_at}
+
+              
+            </span>
+                        <div class="clear"></div>`;
+                });
+
+                chatbox.scrollTop = chatbox.scrollHeight;
+            } else if (data.message) {
+                const message = data.message;
+                const sender = data.username;
+                const chatbox = document.getElementById('chatbox');
+                const messageClass = sender === username ? 'right' : 'left';
+
+                const imgTag = sender !== username ? `<img src="${friendImage || '/static/images/noprofile.png'}" alt="${sender}" class="rounded-full h-10 gap-x-2 w-10 mb-1 object-cove">` : '';
+
+                chatbox.innerHTML += `
+                    <div class="flex flex-col my-1 mx-0">
+                          ${imgTag}
+                        <div class="message ${messageClass}">
+                          
+                            ${message}
+                        </div>
+                                               <span class="text-xs my-1 opacity-0 group-hover:opacity-100 text-gray-500 transition-opacity duration-300">
+                
+                ${new Date().toISOString()}
+            </span>
+                    </div>
+                    <div class="clear"></div>`;
+
+                chatbox.scrollTop = chatbox.scrollHeight;
+
+
+            }
+        }
+
+        socket.onerror = function(error) {
+            Toastify({
+                text: "Unable to connect to chat. Please refresh or try again later.",
+                duration: 9000,
+                gravity: "top",  
+                position: 'center', 
+                backgroundColor: "#f28b82", 
+
+            }).showToast();
+            console.error('WebSocket Error:', error);
+            isConnected = false;
+        }
+
+
+        socket.onclose = function() {
+            console.log(`Disconnected from chat with ${friendName}`);
+            isConnected = false; 
+        };
+
+       
+        chatContainer.classList.remove("hidden");
+    }
+
+
+// Detect if a friend parameter is present in the URL
+document.addEventListener('DOMContentLoaded', function () {
+  const urlParams = new URLSearchParams(window.location.search);
+  const friendName = urlParams.get('friend'); // Get the friend's username from the URL
+
+  if (friendName) {
+    // Automatically open chat if a friend name is found in the URL
+    const friendElement = document.querySelector(`.friend[data-name="${friendName}"]`);
+    if (friendElement) {
+      const friendImage = friendElement.getAttribute("data-image");
+      openChat(friendName, friendImage);
+    }
+  }
+});
+
+
+    openChatButtons.forEach(button => {
+        button.addEventListener('click', function () {
+            const friendName = button.getAttribute("data-name");
+            const friendImage = button.getAttribute("data-image");
+            openChat(friendName, friendImage);
+        });
+    });
+
+    sendButton.addEventListener('click', function () {
+        const message = userInput.value.trim();
+
+
+       // Check if WebSocket connection is not open
+    if (!socket || socket.readyState !== WebSocket.OPEN) {
+        Toastify({
+            text: "Failed to send message: Chat connection is unavailable. Please try to refresh or check your connection",
+            duration: 2000,
+            gravity: "top",
+            position: 'center',
+            stopOnFocus: true,
+            style: {
+                color:"white",
+                background: "Red",
+              },  
+        }).showToast();
+    } else if (message) {  // Only send if there's a message and socket is open
+        socket.send(JSON.stringify({
+            message: message,
+            username: username,
+            other_username: otherUsernameDisplay.textContent,
+        }));
+        document.getElementById('message-sent').play()
+        userInput.value = '';
+        
+        
+    }
+    });
+
+    closeChatButton.addEventListener('click', function () {
+        if (socket) {
+            socket.close();
+            socket = null;
+        }
+        chatContainer.classList.add("hidden");
+    });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// getting the unread_count from localStorage to prevent them getting vanish when refresh
+
+window.addEventListener('load', function() {
+   
+    // when page reloads, get the unread counts from the localStorage if have any otherwise give an empty object
+    const unreadCounts = JSON.parse(localStorage.getItem('unreadCounts')) || {};
+
+    // get the DOM of every friend and update the unread_count
+    document.querySelectorAll('.friend').forEach(friendElement => {
+        const friendName = friendElement.dataset.name;
+        const unreadCount = unreadCounts[friendName];
+
+        const unreadCountSpan = friendElement.querySelector('.unread-count');
+        
+        if (unreadCount > 0) {
+            unreadCountSpan.textContent = unreadCount;
+            unreadCountSpan.classList.remove('hidden');
+        } else {
+            unreadCountSpan.classList.add('hidden');
+        }
+    });
+});
+
+
+// to hide the uread_badge when chatbox is opened..
+
+let currentChatbox = null;
+
+document.querySelectorAll('.friend').forEach(friendElement => {
+    friendElement.addEventListener('click', function() {
+        const friendName = friendElement.dataset.name;
+
+        currentChatbox = friendName;
+
+        // Reset the unread count for specific friend
+        const unreadCountSpan = friendElement.querySelector('.unread-count');
+        unreadCountSpan.classList.add('hidden'); 
+        unreadCountSpan.textContent = '0'; 
+
+        // updating in localStorage as well
+        const unreadCounts = JSON.parse(localStorage.getItem('unreadCounts')) || {};
+        unreadCounts[friendName] = 0;
+        localStorage.setItem('unreadCounts', JSON.stringify(unreadCounts));
+
+    });
+});
+
+</script>
+
+{% endblock %}

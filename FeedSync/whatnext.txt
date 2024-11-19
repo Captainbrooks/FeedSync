@@ -1,0 +1,33 @@
+==> Logout modal are you sure ? Yes or cancel === done
+
+==> Redesign the profile and profile_url for better viewing ==> done
+
+==> Search Friends in Messenger not done
+
+
+==> Ajax req handling approach for liking anc commenting.. so that update are there without being refresh == done for both like and comments
+
+==> Toat message handling on different events=done
+
+==> Tailwind Integration == done
+
+
+==> Error handling for web sockets and backend errors.. done
+
+
+
+
+== comment add ,
+comment delete
+post add
+post delete
+profile picture add
+profile picture delete
+socket connection 
+message send 
+Search
+
+timing
+
+posting logic only caption == done
+

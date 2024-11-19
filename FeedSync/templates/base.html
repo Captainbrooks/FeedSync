@@ -1,0 +1,836 @@
+{% load static tailwind_tags %}
+
+{% load static %}
+
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>FeedSync</title>
+
+    {% tailwind_css %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.6.0/flowbite.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+
+    <link rel="stylesheet" href="https://unpkg.com/@material-tailwind/html@latest/styles/material-tailwind.css" />
+
+
+    <script src="https://unpkg.com/@material-tailwind/html@latest/scripts/script-name.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
+   
+
+
+</head>
+
+<style>
+
+
+</style>
+
+<body>
+
+
+
+
+    <input type="text" name="" class="hidden" id="user-id" value="{{request.user.id}}">
+
+
+
+
+    <!-- Navbar -->
+    <nav
+        class="fixed top-0 left-0 w-full border-b border-gray-200 bg-gray-50 transition-transform duration-300 ease-in-out z-10">
+        <div class="flex justify-between items-center p-2">
+
+
+            <div class="flex items-center space-x-2">
+                <!-- Logo -->
+                <a href="/" class="block">
+                    <img src="/static/images/feedsync.png" class="h-12 w-12 object-cover rounded-full"
+                        alt="FeedSync Logo" />
+                </a>
+               <a href="/"> <span class="block sm:hidden self-center text-2xl font-semibold whitespace-nowrap">FeedSync</span></a>
+
+
+                <!-- Search Bar (Visible on medium and larger screens) -->
+                <div class="hidden sm:block">
+                    <form class="bg-gray-100 rounded-full flex items-center shadow-sm border border-gray-300"
+                        action="{% url 'search_friends' %}" method="GET">
+                        {% csrf_token %}
+
+                        <input type="hidden" id="currentUser" value="{{ request.user.username }}">
+                        <input type="hidden" id="isAuthenticated" value="{{ request.user.is_authenticated }}">
+
+                        <input type="search" name="search" id="search_friends_big" placeholder="Search..."
+                            class="flex-grow bg-gray-100 text-gray-700 rounded-l-full border-none focus:outline-none px-3 py-2 text-sm" />
+                        <button type="submit"
+                            class="px-2 py-2 bg-gray-100 rounded-r-full hover:bg-gray-200 focus:outline-none" disabled>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-gray-600" fill="currentColor"
+                                viewBox="0 0 50 50">
+                                <path
+                                    d="M 21 3 C 11.621094 3 4 10.621094 4 20 C 4 29.378906 11.621094 37 21 37 C 24.710938 37 28.140625 35.804688 30.9375 33.78125 L 44.09375 46.90625 L 46.90625 44.09375 L 33.90625 31.0625 C 36.460938 28.085938 38 24.222656 38 20 C 38 10.621094 30.378906 3 21 3 Z M 21 5 C 29.296875 5 36 11.703125 36 20 C 36 28.296875 29.296875 35 21 35 C 12.703125 35 6 28.296875 6 20 C 6 11.703125 12.703125 5 21 5 Z">
+                                </path>
+                            </svg>
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="hidden w-1/2 md:block p-2" id="navbar-menu">
+                <ul
+                    class="sm:flex flex-col gap-x-28 justify-center items-center font-medium rounded-lg bg-gray-200 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 md:bg-transparent sm:p-0">
+                    <li class="flex flex-col items-center">
+                        <a id="home_icon" href="/"
+                            class="block text-gray-500 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700">
+                            <span class="flex items-center justify-center">
+                                <i class="fa-solid fa-house text-2xl"></i>
+                            </span>
+                        </a>
+                    </li>
+                    <li class="flex flex-col items-center">
+                        <a href="/messenger" id="messenger_icon"
+                            class="block md:p-0 text-gray-500 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700">
+                            <span class="flex items-center justify-center">
+                                <i class="fa-brands fa-facebook-messenger text-2xl"></i>
+                            </span>
+                        </a>
+                    </li>
+                    <li class="flex flex-col items-center relative text-gray-700 ">
+                        <a id="friend_icon" href="{% url 'friends' %}" class="relative text-gray-500 ">
+                            <i class="fa-solid fa-user-group text-2xl"></i>
+                            {% if pending_requests_count > 0 %}
+                            <span
+                                class="absolute -top-1 -right-2 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-red-600 rounded-full">
+                                {{ pending_requests_count }}
+                            </span>
+                            {% endif %}
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+<div class="w-1/4 flex justify-end items-center space-x-10">
+                <!-- Notifications -->
+                <a id="notificationElement" class="relative text-gray-500 hover:text-blue-600">
+                    <i class="fa-solid fa-bell text-2xl"></i>
+                    <!-- Notification badge -->
+                    <span id="notification_counter"
+                        class="absolute -top-1 -right-2 items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-red-600 rounded-full hidden"></span>
+                </a>
+
+
+                <a href="/profile" class="hidden sm:block">
+                    {% if profile_image_url %}
+                    <img src="{{ profile_image_url }}" class="h-10 w-10 rounded-full object-cover border"
+                        alt="Profile" />
+                    {% elif admin_info.admin_profile_image %}
+                    <img src="{{ admin_info.admin_profile_image }}" class="h-10 w-10 rounded-full object-cover border"
+                        alt="Profile" />
+                    {% else %}
+                    <svg class="w-10 h-10 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="currentColor"
+                        viewBox="0 0 20 20">
+                        <path
+                            d="M10 0a10 10 0 1 0 10 10A10.011 10.011 0 0 0 10 0Zm0 5a3 3 0 1 1 0 6 3 3 0 0 1 0-6Zm0 13a8.949 8.949 0 0 1-4.951-1.488A3.987 3.987 0 0 1 9 13h2a3.987 3.987 0 0 1 3.951 3.512A8.949 8.949 0 0 1 10 18Z" />
+                    </svg>
+                    {% endif %}
+                </a>
+
+                <button data-drawer-target="default-sidebar" data-drawer-toggle="default-sidebar"
+                    class="inline-flex items-center p-2 text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16m-7 6h7"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Search bar for smaller screens -->
+
+        {% if messages %}
+        <div id="django-messages"
+            data-messages='[{% for message in messages %}{"text": "{{ message }}", "tag": "{{ message.tags }}"}{% if not forloop.last %},{% endif %}{% endfor %}]'>
+        </div>
+        {% endif %}
+
+
+        <!-- django messages -->
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const messagesDiv = document.getElementById('django-messages');
+                if (messagesDiv) {
+                    const messages = JSON.parse(messagesDiv.getAttribute('data-messages'));
+
+                    messages.forEach(message => {
+                        Toastify({
+                            text: message.text,
+                            duration: 3000,
+                            gravity: "top",
+                            position: "center",
+                            backgroundColor: message.tag.includes("success") ? "green" : "red",
+                            style: {
+                                color: "white"
+                            },
+                            stopOnFocus: true
+                        }).showToast();
+                    });
+                }
+            });
+        </script>
+        <!-- django messages -->
+
+
+        <div class="block sm:hidden px-2 py-2">
+            <form class="bg-gray-100 rounded-full flex items-center shadow-sm border border-gray-300"
+                action="{% url 'search_friends' %}" method="GET" id="searchForm">
+                {% csrf_token %}
+
+                <input type="hidden" id="currentUser" value="{{ request.user.username }}">
+                <input type="hidden" id="isAuthenticated" value="{{ request.user.is_authenticated }}">
+
+                <input type="search" id="search_friends_small" name="search" placeholder="Search..."
+                    class="flex-grow bg-gray-100 text-gray-700 rounded-l-full border-none focus:outline-none px-3 py-2 text-sm" />
+                <button type="submit" class="px-2 py-2 bg-gray-100 rounded-r-full hover:bg-gray-200 focus:outline-none"
+                    id="searchButton" disabled>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-gray-600" fill="currentColor"
+                        viewBox="0 0 50 50">
+                        <path
+                            d="M 21 3 C 11.621094 3 4 10.621094 4 20 C 4 29.378906 11.621094 37 21 37 C 24.710938 37 28.140625 35.804688 30.9375 33.78125 L 44.09375 46.90625 L 46.90625 44.09375 L 33.90625 31.0625 C 36.460938 28.085938 38 24.222656 38 20 C 38 10.621094 30.378906 3 21 3 Z M 21 5 C 29.296875 5 36 11.703125 36 20 C 36 28.296875 29.296875 35 21 35 C 12.703125 35 6 28.296875 6 20 C 6 11.703125 12.703125 5 21 5 Z">
+                        </path>
+                    </svg>
+                </button>
+            </form>
+        </div>
+        </div>
+    </nav>
+    <!-- Footer for Mobile -->
+    <footer
+        class="sm:hidden fixed bottom-0 left-0 z-20 w-full bg-white shadow-md border-t border-gray-200 transition-transform duration-300 ease-in-out">
+        <ul class="w-full flex justify-around items-center py-2 bg-gray-100">
+            <li>
+                <a id="home_icon_small" href="/" class="flex flex-col items-center text-gray-500 hover:text-blue-600">
+                    <i class="fa-solid fa-house text-2xl"></i>
+                    <span class="text-sm">Home</span>
+                </a>
+            </li>
+            <li>
+                <a id="messenger_icon_small" href="/messenger"
+                    class="flex flex-col items-center text-gray-500 hover:text-blue-600">
+                    <i class="fa-brands fa-facebook-messenger text-2xl"></i>
+                    <span class="text-sm">Messenger</span>
+                </a>
+            </li>
+            <li>
+                <a id="friend_icon_small" href="{% url 'friends' %}"
+                    class="relative flex flex-col items-center text-gray-500 hover:text-blue-600">
+                    <i class="fa-solid fa-user-group text-2xl"></i>
+                    <span class="text-sm">Friends</span>
+                    {% if pending_requests_count > 0 %}
+                    <span
+                        class="absolute -top-1 -right-2 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-red-600 rounded-full">
+                        {{ pending_requests_count }}
+                    </span>
+                    {% endif %}
+                </a>
+            </li>
+        </ul>
+    </footer>
+
+    <div class="absolute top-16 left-0 w-1/2 max-w-xs bg-white shadow-lg rounded-lg p-4 z-50 hidden" id="searchDiv_big"
+        style="position: fixed; z-index: 1000;">
+    </div>
+
+
+    <div class="absolute top-28 left-0 w-full  bg-white shadow-lg rounded-lg p-4 z-50 hidden" id="searchDiv_small"
+        style="position: fixed; z-index: 1000;">
+    </div>
+
+    <div id="notificationDiv"
+        class="fixed top-20 right-5 w-full h-3/4 max-w-xs bg-white shadow-lg rounded-lg z-50 p-2 hidden overflow-y-scroll">
+        <div class="flex items-center justify-between pb-3 border-b border-gray-200">
+            <span class="font-semibold text-lg text-gray-900">Notifications</span>
+          <a href="/clear_notification">  <button id="clear_notification" class="bg-red-300 hover:bg-red-500 px-2 py-0.5 text-xs rounded-lg text-white">Clear All</button></a>
+        </div>
+
+        <div id="notification-list" class="mt-4 space-y-2">
+
+            
+            {% if previous_notifications %}
+                
+            {% for notification in previous_notifications %}
+            <div
+                class="flex gap-x-2 items-center p-3 bg-gray-100 hover:bg-gray-200 transition-colors rounded-lg text-gray-700 shadow-sm hover:cursor-pointer">
+
+                <img src="{{notification.profile_picture}}" alt="Pp" class="w-8 h-8 rounded-full object-cover">
+                {{ notification }}
+            </div>
+            {% endfor %}
+
+            {% else %}
+            <div class="flex justify-center items-center">
+            <p class="text-gray-500 ">You have no notification at the moment</p>
+        </div>
+
+         
+            
+
+            {% endif %}
+        </div>
+        
+      
+    </div>
+
+    <audio id="notification_sound" src="\static\sound\notification.mp3" preload="auto"></audio>
+    {% block start %}
+    {% endblock %}
+
+    <!-- js for both big and small search friends functionality -->
+    <script>
+
+
+
+
+
+        // Big search
+        document.addEventListener('DOMContentLoaded', () => {
+            const searchInput = document.getElementById('search_friends_big');
+            const searchDiv = document.getElementById('searchDiv_big');
+            const currentUser = document.getElementById('currentUser').value;
+            const isAuthenticated = document.getElementById('isAuthenticated').value === 'True';
+
+
+            searchInput.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter') {
+                    event.preventDefault(); // Disable Enter key
+                }
+            });
+
+            // Prevent the Enter key from being used when the input is empty
+            searchInput.addEventListener('keydown', (event) => {
+                const query = searchInput.value.trim();
+
+                if (event.key === 'Enter' && query === '') {
+                    // If Enter is pressed and query is empty, prevent default action
+                    event.preventDefault();
+
+                    // Optionally, show a Toastify message
+                    Toastify({
+                        text: "Please enter a search query.",
+                        duration: 1000,
+                        gravity: "top", // top or bottom
+                        position: "center", // left, right or center
+                        backgroundColor: "red",
+                        style: {
+                            color: "white"
+                        },
+                    }).showToast();
+                }
+            });
+
+            searchInput.addEventListener('input', () => {
+                const query = searchInput.value.trim();
+
+                // Prevent sending a request if the query is empty
+                if (query === '') {
+                    searchDiv.style.display = 'none';
+                    return;
+                }
+
+                // Proceed with the fetch request if the query is valid
+                fetch(`/search_friends?search=${encodeURIComponent(query)}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.status === 'error') {
+                            Toastify({
+                                text: data.message,
+                                duration: 3000,
+                                close: true,
+                                gravity: "top",
+                                position: "center",
+                                backgroundColor: "red",
+                                style: {
+                                    color: "white"
+                                },
+                            }).showToast();
+
+                            searchDiv.style.display = 'none';
+                        } else if (data.results && data.results.length > 0) {
+                            searchDiv.innerHTML = data.results.map(result => {
+                                let userMessage = '';
+                                let profileUrl = `/profile/${encodeURIComponent(result.username)}`;
+
+                                if (result.username === currentUser) {
+                                    userMessage = `<p class="p-1 text-gray-500">You</p>`;
+                                    profileUrl = "/profile";
+                                }
+
+                                return `
+                                   <a href="${profileUrl}">
+                                    <div class="search-result-item flex items-center p-2 border-b border-gray-200 hover:bg-gray-200">
+                                        ${result.profile_picture ?
+                                        `<img src="${result.profile_picture}" alt="${result.username}" class="w-10 h-10 rounded-full object-cover">`
+                                        :
+                                        `<svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4c-1.97 0-3.6 1.63-3.6 3.6S10.03 11.2 12 11.2 15.6 9.57 15.6 7.6 13.97 4 12 4zM18.8 20.4C18.8 17.5 15.6 15.4 12 15.4S5.2 17.5 5.2 20.4"></path>
+                                            </svg>`
+                                    }
+                                        <span class="ml-2">${result.username} ${userMessage}</span>  
+                                    </div>
+                                   </a>
+                                `;
+                            }).join('');
+                            searchDiv.style.display = 'block';
+                        } else {
+                            searchDiv.innerHTML = `<p class="p-2">No results found for '${query}'</p>`;
+                            searchDiv.style.display = 'block';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('There was a problem with the fetch operation:', error);
+                    });
+            });
+        });
+
+        // big search
+
+
+
+
+
+
+
+
+        // small search
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const searchInput = document.getElementById('search_friends_small');
+            const searchDiv = document.getElementById('searchDiv_small');
+            const currentUser = document.getElementById('currentUser').value;
+            const isAuthenticated = document.getElementById('isAuthenticated').value === 'True';
+
+
+            searchInput.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter') {
+                    event.preventDefault(); // Disable Enter key
+                }
+            });
+
+            // Prevent the Enter key from being used when the input is empty
+            searchInput.addEventListener('keydown', (event) => {
+                const query = searchInput.value.trim();
+
+                if (event.key === 'Enter' && query === '') {
+                    // If Enter is pressed and query is empty, prevent default action
+                    event.preventDefault();
+
+                    // Optionally, show a Toastify message
+                    Toastify({
+                        text: "Please enter a search query.",
+                        duration: 1000,
+                        gravity: "top", // top or bottom
+                        position: "center", // left, right or center
+                        backgroundColor: "red",
+                        style: {
+                            color: "white"
+                        },
+                    }).showToast();
+                }
+            });
+
+            searchInput.addEventListener('input', () => {
+                const query = searchInput.value.trim();
+
+                // Prevent sending a request if the query is empty
+                if (query === '') {
+                    searchDiv.style.display = 'none';
+                    return;
+                }
+
+                // Proceed with the fetch request if the query is valid
+                fetch(`/search_friends?search=${encodeURIComponent(query)}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.status === 'error') {
+                            Toastify({
+                                text: data.message,
+                                duration: 3000,
+                                close: true,
+                                gravity: "top",
+                                position: "center",
+                                backgroundColor: "red",
+                                style: {
+                                    color: "white"
+                                },
+                            }).showToast();
+
+                            searchDiv.style.display = 'none';
+                        } else if (data.results && data.results.length > 0) {
+                            searchDiv.innerHTML = data.results.map(result => {
+                                let userMessage = '';
+                                let profileUrl = `/profile/${encodeURIComponent(result.username)}`;
+
+                                if (result.username === currentUser) {
+                                    userMessage = `<p class="p-1 text-gray-500">You</p>`;
+                                    profileUrl = "/profile";
+                                }
+
+                                return `
+                                   <a href="${profileUrl}">
+                                    <div class="search-result-item flex items-center p-2 border-b border-gray-200 hover:bg-gray-200">
+                                        ${result.profile_picture ?
+                                        `<img src="${result.profile_picture}" alt="${result.username}" class="w-10 h-10 rounded-full object-cover">`
+                                        :
+                                        `<svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4c-1.97 0-3.6 1.63-3.6 3.6S10.03 11.2 12 11.2 15.6 9.57 15.6 7.6 13.97 4 12 4zM18.8 20.4C18.8 17.5 15.6 15.4 12 15.4S5.2 17.5 5.2 20.4"></path>
+                                            </svg>`
+                                    }
+                                        <span class="ml-2">${result.username} ${userMessage}</span>  
+                                    </div>
+                                   </a>
+                                `;
+                            }).join('');
+                            searchDiv.style.display = 'block';
+                        } else {
+                            searchDiv.innerHTML = `<p class="p-2">No results found for '${query}'</p>`;
+                            searchDiv.style.display = 'block';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('There was a problem with the fetch operation:', error);
+                    });
+            });
+        });
+
+        // small search
+
+
+
+
+
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const dropdownButtons = document.querySelectorAll('[id^="dropdownButton-"]');
+            dropdownButtons.forEach(button => {
+                button.addEventListener('click', function (event) {
+                    const menuId = this.id.replace('Button', 'Menu');
+                    const dropdownMenu = document.getElementById(menuId);
+                    dropdownMenu.classList.toggle('hidden');
+
+                    // Close the dropdown if the user clicks outside of it
+                    document.addEventListener('click', function (event) {
+                        const isClickInside = button.contains(event.target) || dropdownMenu.contains(event.target);
+                        if (!isClickInside) {
+                            dropdownMenu.classList.add('hidden');
+                        }
+                    });
+                });
+            });
+        });
+
+
+
+
+
+    </script>
+    <!-- js for both big and small search friends functionality -->
+
+    <!-- js to hide and show nav and footer on scrolling event -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const navbar = document.querySelector('nav');
+            const footer = document.querySelector('footer');
+
+            let lastScrollTop = 0; // Track the last scroll position
+
+            window.addEventListener('scroll', function () {
+                // Check if the screen width is less than 576 pixels
+                if (window.innerWidth < 1536) {
+                    let currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+
+                    // Check scroll direction
+                    if (currentScroll > lastScrollTop) {
+                        // Scrolling down
+                        navbar.classList.add('-translate-y-full'); // Hide nav
+                        footer.classList.add('translate-y-full'); // Hide footer
+                    } else {
+                        // Scrolling up
+                        navbar.classList.remove('-translate-y-full'); // Show nav
+                        footer.classList.remove('translate-y-full'); // Show footer
+                    }
+                    lastScrollTop = currentScroll <= 0 ? 0 : currentScroll; // For Mobile or negative scrolling
+                } else {
+                    // Remove classes if the screen is wider than 576 pixels
+                    navbar.classList.remove('translate-y-full');
+                    footer.classList.remove('translate-y-full');
+                }
+            });
+        });
+    </script>
+    <!-- js to hide and show nav and footer on scrolling event -->
+
+
+
+    <!-- notifications.js -->
+    <script>
+
+
+        const userId = document.getElementById('user-id').value;
+        const notificationSocket = new WebSocket(
+            `ws://${window.location.host}/ws/notifications/`
+        );
+
+        notificationSocket.onopen = function (event) {
+          
+
+            // Start keep-alive interval to prevent idle disconnection
+            setInterval(() => {
+                if (notificationSocket.readyState === WebSocket.OPEN) {
+                    notificationSocket.send(JSON.stringify({ type: "keep_alive" }));
+                }
+            }, 30000); // Every 30 seconds
+        };
+
+
+        notification_counter_span = document.getElementById("notification_counter");
+        notify_counter = 0
+
+        notificationSocket.onmessage = function (e) {
+
+            const data = JSON.parse(e.data);
+
+          
+
+            const currentPath = window.location.pathname;
+
+          
+                document.getElementById("notification_sound").play()
+            
+
+
+            const notificationList = document.getElementById("notification-list");
+
+
+            const newNotification = document.createElement('div');
+            newNotification.classList.add('flex', 'gap-x-2', 'items-center', 'p-3', 'bg-gray-100', 'hover:bg-gray-200', 'transition-colors', 'rounded-lg', 'text-gray-700', 'shadow-sm', 'hover:cursor-pointer');
+
+            const profile_pic_element = document.createElement('img');
+            profile_pic_element.src = data.profile_picture
+            profile_pic_element.classList.add('w-8', 'h-8', 'rounded-full', 'object-cover')
+
+            const notificationText = document.createElement('span');
+            notificationText.textContent = data.notification;
+
+            newNotification.appendChild(profile_pic_element)
+            newNotification.appendChild(notificationText)
+
+            // Insert at the top of the list
+            notificationList.prepend(newNotification);
+            notify_counter++;
+
+            notification_counter_span.classList.add('block')
+            notification_counter_span.classList.remove('hidden')
+            notification_counter_span.textContent = notify_counter
+
+
+            if (data.notification) {
+
+
+                const senderName = data.sender
+                const unreadCount = data.unread_count
+
+
+                // get the unread counts from localStorager and convert it into an JSON object using JSON.parse if first time running it will give null so assigning an empty object to avoid errors
+                const unreadCounts = JSON.parse(localStorage.getItem('unreadCounts')) || {};
+
+                // now here unreadCounts is an object, since we are getting the senderName as well as the unread_counts from backend, so saving the unread_counts based on name,
+                unreadCounts[senderName] = unreadCount;
+
+                // and finally saving the info into localStorage
+                localStorage.setItem('unreadCounts', JSON.stringify(unreadCounts));
+
+
+                // gets the DOM of the friend name which have the "friend" class
+                const friendElement = document.querySelector(`.friend[data-name="${senderName}"]`);
+
+
+                if (friendElement) {
+
+
+                    // picks the DOM of the friendELement which has the class .unread-count to display the unread_count badge
+                    const unreadCountSpan = friendElement.querySelector('.unread-count');
+
+                    // If unread count > 0, show the badge with the number
+                    if (unreadCount > 0) {
+                        document.getElementById("new-message").play()
+                        unreadCountSpan.textContent = unreadCount;
+                        unreadCountSpan.classList.remove('hidden');  // Show the badge
+                        unreadCountSpan.dataset.unreadCount = unreadCount;
+
+                    } else {
+                        unreadCountSpan.classList.add('hidden'); // Hide the badge if no unread messages
+                    }
+                }
+            }
+
+        };
+
+
+
+        notificationSocket.onclose = function (e) {
+            console.error('Notification socket closed unexpectedly');
+
+            Toastify({
+                text: "You are currently offline. Please refresh",
+                duration: 10000,
+                gravity: "top",
+                position: "center",
+                backgroundColor: "{% if 'success' in message.tags %}green{% else %}red{% endif %}", // Green for success, Red for others // 'left' or 'right'
+                style: {
+                    color: "white"
+                    // White text for all toasts
+                },
+                stopOnFocus: true, // Stop toast from disappearing on hover
+            }).showToast();
+        };
+
+
+
+
+    </script>
+    <!-- notifications.js -->
+
+    <!--   js to toggle the notfication Element -->
+    <script>
+
+
+        // Get the elements
+        const notificationElement = document.getElementById("notificationElement");
+        const notificationDiv = document.getElementById("notificationDiv");
+        notification_counter_span = document.getElementById("notification_counter");
+
+
+        // Toggle visibility of the notificationDiv when notificationElement is clicked
+        notificationElement.addEventListener("click", function (event) {
+            event.stopPropagation(); // Prevent the click from bubbling to the document level
+            if (notificationDiv.classList.contains('hidden')) {
+                notificationDiv.classList.remove('hidden');
+                notificationDiv.classList.add('block');
+
+                notification_counter_span.classList.add("hidden")
+                notification_counter_span.classList.remove("block")
+                notify_counter = 0
+            } else {
+                notificationDiv.classList.remove('block');
+                notificationDiv.classList.add('hidden');
+                notification_counter_span.classList.add("hidden")
+                notification_counter_span.classList.remove("block")
+
+
+            }
+        });
+
+        // Hide the notificationDiv when clicking outside of it
+        document.addEventListener("click", function (event) {
+            if (!notificationDiv.contains(event.target) && event.target !== notificationElement) {
+                notificationDiv.classList.add('hidden');
+                notificationDiv.classList.remove('block');
+            }
+        });
+
+    </script>
+    <!--   js to toggle the notfication Element -->
+
+    <!-- js to find the current path -->
+    <script>
+
+        const currentPath = window.location.pathname;
+        
+
+
+        const home = document.getElementById("home_icon")
+        const messenger = document.getElementById("messenger_icon")
+        const friends = document.getElementById("friend_icon")
+
+
+        if (currentPath === "/") {
+            home.classList.remove('text-gray-500')
+            home.classList.add('text-blue-700')
+
+        } else if (currentPath === "/messenger/") {
+            messenger.classList.remove('text-gray-500')
+            messenger.classList.add('text-blue-700')
+        } else if (currentPath === "/friends/") {
+            friends.classList.remove('text-gray-500')
+            friends.classList.add('text-blue-700')
+        } else {
+            home.classList.add('text-gray-500')
+            home.classList.remove('text-blue-700')
+
+            messenger.classList.add('text-gray-500')
+            messenger.classList.remove('text-blue-700')
+
+            friends.classList.add('text-gray-500')
+            friends.classList.remove('text-blue-700')
+        }
+
+    </script>
+    <!-- js to find the current path -->
+
+    <!-- js to find the current path for small screen -->
+    <script>
+
+        const currentRoute = window.location.pathname;
+       
+
+
+        const home_small = document.getElementById("home_icon_small")
+        const messenger_small = document.getElementById("messenger_icon_small")
+        const friends_small = document.getElementById("friend_icon_small")
+
+
+        if (currentRoute === "/") {
+            home_small.classList.remove('text-gray-500')
+            home_small.classList.add('text-blue-700')
+
+        } else if (currentRoute === "/messenger/") {
+            messenger_small.classList.remove('text-gray-500')
+            messenger_small.classList.add('text-blue-700')
+        } else if (currentRoute === "/friends/") {
+            friends_small.classList.remove('text-gray-500')
+            friends_small.classList.add('text-blue-700')
+        } else {
+            home_small.classList.add('text-gray-500')
+            home_small.classList.remove('text-blue-700')
+
+            messenger_small.classList.add('text-gray-500')
+            messenger_small.classList.remove('text-blue-700')
+
+            friends_small.classList.add('text-gray-500')
+            friends_small.classList.remove('text-blue-700')
+        }
+
+    </script>
+    <!-- js to find the current path for small screen -->
+</body>
+
+</html>
