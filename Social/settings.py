@@ -25,12 +25,13 @@ SECRET_KEY = 'django-insecure-mnhbsljk5h$k%yx1#q7^b=rj-wkuky$g&3a9ikkc&a6=x1cx$5
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["feedsync.onrender.com"]
+ALLOWED_HOSTS = ["feedsync.onrender.com","localhost"]
 
 
 # Application definition
 
 INSTALLED_APPS = [
+    
     
     "daphne",
     'channels',
@@ -44,7 +45,8 @@ INSTALLED_APPS = [
     'FeedSync',
     'tailwind',
     'theme',
-    'django_browser_reload'
+    'django_browser_reload',
+    'whitenoise.runserver_nostatic',
 
 
 ]
@@ -66,6 +68,7 @@ INTERNAL_IPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -158,8 +161,16 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [
-    BASE_DIR / "static",  # Make sure the path is correct
+    BASE_DIR / "static/",  # Make sure the path is correct
 ]
+
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
+
+
+
+
+
 
 
 

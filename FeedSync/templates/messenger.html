@@ -81,12 +81,13 @@
         {% if my_friends %}
         {% for m in my_friends %}
 
-       
         <div class="friend w-full flex items-center hover:bg-gray-300 p-2 cursor-pointer" 
-             data-name="{{ m.name }}" 
-             data-image="{{ m.image | default:'/static/images/noprofile.png' }}"> <!-- Default profile image if none -->
+        data-name="{{ m.name }}" 
+        data-image="{{ m.image.url if m.image else static('images/noprofile.png') }}">
+   <!-- Default profile image if none -->
 
-          <img src="{{ m.image | default:'/static/images/noprofile.png' }}" alt="{{ m.name }}" class="rounded-full h-12 w-12 mb-1 object-cover">
+   <img src="{{ m.image.url | default: static('images/noprofile.png') }}" alt="{{ m.name }}" class="rounded-full h-12 w-12 mb-1 object-cover">
+
           
           <h1 class="ml-4 font-bold" data-name="{{m.name}}">{{ m.name }}</h1>
 
@@ -132,8 +133,8 @@
 </div>
 
 
-<audio id="new-message" src="\static\sound\newmessage.mp3" preload="auto"></audio>
-<audio id="message-sent" src="\static\sound\messageSent.mp3" preload="auto"></audio>
+<audio id="new-message" src="{% static 'sound\newmessage.mp3' %}" preload="auto"></audio>
+<audio id="message-sent" src="{% static 'sound\messageSent.mp3' %}" preload="auto"></audio>
 
 <script>
     const chatContainer = document.getElementById("chat-container");

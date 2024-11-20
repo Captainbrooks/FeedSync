@@ -5,6 +5,8 @@
 
 {% block start %}
 
+{% load static %}
+
 
 
 
@@ -471,7 +473,7 @@
                                         </button>
                                     </div>
 
-                                    <audio id="like-sound" src="\static\sound\likesound.wav" preload="auto"></audio>
+                                    <audio id="like-sound" src="{% static 'sound\likesound.wav' %}" preload="auto"></audio>
                                     <!-- Like end -->
 
                                    
@@ -489,7 +491,7 @@
  
  
 
-                                    <audio id="comment-sound" src="\static\sound\comment.mp3" preload="auto"></audio>
+                                    <audio id="comment-sound" src="{% static 'sound\comment.mp3' %}" preload="auto"></audio>
                                     <!-- comment end -->
 
                                     <!-- share -->

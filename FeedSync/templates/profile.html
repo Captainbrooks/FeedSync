@@ -328,7 +328,8 @@
             </button>
         </div>
 
-        <audio id="like-sound" src="..\static\sound\likesound.wav" preload="auto"></audio>
+        <audio id="like-sound" src="{% static 'sound\likesound.wav' %}" preload="auto"></audio>
+        
         <!-- Like end -->
 
 
@@ -337,7 +338,7 @@
                                 <i class="fa-regular fa-comment text-2xl text-gray-500"></i>Comment
                             </div>
 
-                            <audio id="comment-sound" src="\static\sound\comment.mp3" preload="auto"></audio>
+                            <audio id="comment-sound" src="{% static  'sound\comment.mp3' %}" preload="auto"></audio>
 
                             <div class="px-2 py-0.5 flex gap-2 items-center font-semibold hover:bg-zinc-200">
                                 <i class="fa-solid fa-share text-2xl text-gray-500"></i>Share
