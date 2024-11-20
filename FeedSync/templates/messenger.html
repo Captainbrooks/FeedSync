@@ -83,7 +83,12 @@
 
         <div class="friend w-full flex items-center hover:bg-gray-300 p-2 cursor-pointer" 
         data-name="{{ m.name }}" 
-        data-image="{{ m.image.url if m.image else static('images/noprofile.png') }}">
+        {% if m.image %}
+        data-image="{{ m.image.url }}"
+    {% else %}
+        data-image="{% static 'images/noprofile.png' %}"
+    {% endif %}
+    >
    <!-- Default profile image if none -->
 
    <img src="{{ m.image.url | default: static('images/noprofile.png') }}" alt="{{ m.name }}" class="rounded-full h-12 w-12 mb-1 object-cover">
