@@ -93,7 +93,7 @@
     >
    <!-- Default profile image if none -->
 
-   <img src="{{ m.image.url | default: static('images/noprofile.png') }}" alt="{{ m.name }}" class="rounded-full h-12 w-12 mb-1 object-cover">
+   <img src="{% if m.image %}{{ m.image.url }}{% else %}{% static 'images/noprofile.png' %}{% endif %}" alt="{{ m.name }}" class="rounded-full h-12 w-12 mb-1 object-cover">
 
           
           <h1 class="ml-4 font-bold" data-name="{{m.name}}">{{ m.name }}</h1>
