@@ -594,7 +594,7 @@
 
         const userId = document.getElementById('user-id').value;
         const notificationSocket = new WebSocket(
-            `ws://${window.location.host}/ws/notifications/`
+            `wss://${window.location.host}/ws/notifications/`
         );
 
         notificationSocket.onopen = function (event) {

@@ -2,6 +2,8 @@
 
 {% block start %}
 
+{% load static %}
+
 <style>
   .message-container {
       display: flex;
@@ -174,7 +176,7 @@
         }
 
         // Opening a new WebSocket connection
-        socket = new WebSocket(`ws://${window.location.host}/ws/messenger/${username}/${friendName}/`);
+        socket = new WebSocket(`wss://${window.location.host}/ws/messenger/${username}/${friendName}/`);
 
         socket.onopen = function() {
             console.log(`Connected to chat with ${friendName}`);
