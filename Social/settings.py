@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-mnhbsljk5h$k%yx1#q7^b=rj-wkuky$g&3a9ikkc&a6=x1cx$5
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["feedsync.onrender.com"]
 
 
 # Application definition
