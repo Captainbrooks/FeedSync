@@ -594,7 +594,7 @@
 
         const userId = document.getElementById('user-id').value;
         const notificationSocket = new WebSocket(
-            `wss://${window.location.host}/ws/notifications/`
+            `wss://www.feedsync.miltongaire.com/ws/notifications/`
         );
 
         notificationSocket.onopen = function (event) {

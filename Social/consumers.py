@@ -73,7 +73,13 @@ class Messenger(AsyncJsonWebsocketConsumer):
 
 # activates when we send message through web sockets from frontend..
     async def receive(self, text_data):
+       
         text_data_json = json.loads(text_data)
+        
+        if text_data_json.get('type') == 'keep_alive':
+            return
+        
+        
         
         
         message_content = text_data_json['message']
@@ -197,18 +203,9 @@ class NotificationConsumer(AsyncJsonWebsocketConsumer):
     async def connect(self):
         self.user = self.scope["user"]
         self.room_group_name = f"user_{self.user.id}_notifications"
-        
-        
+           
+        await self.accept()
 
-        if self.user.is_authenticated:
-            # Join the notification group
-            await self.channel_layer.group_add(
-                self.room_group_name,
-                self.channel_name
-            )
-            await self.accept()
-        else:
-            await self.close()
 
     async def disconnect(self, close_code):
         # Leave the notification group

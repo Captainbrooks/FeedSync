@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-mnhbsljk5h$k%yx1#q7^b=rj-wkuky$g&3a9ikkc&a6=x1cx$5
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["feedsync.onrender.com","localhost"]
+ALLOWED_HOSTS = ["93.127.216.47","feedsync.miltongaire.com","www.feedsync.miltongaire.com","localhost"]
 
 
 # Application definition
@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     
     "daphne",
     'channels',
+    "corsheaders",
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -67,6 +68,7 @@ INTERNAL_IPS = [
 
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     "whitenoise.middleware.WhiteNoiseMiddleware",
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -77,6 +79,17 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     "django_browser_reload.middleware.BrowserReloadMiddleware",
 ]
+
+
+CORS_TRUSTED_ORIGINS = [
+    "https://feedsync.miltongaire.com",
+    "wss://feedsync.miltongaire.com",
+]
+
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+CSRF_COOKIE_SECURE = True  # Ensures CSRF cookie is sent only over HTTPS
+SESSION_COOKIE_SECURE = True
+
 
 ROOT_URLCONF = 'Social.urls'
 
@@ -111,7 +124,7 @@ CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [("rediss://red-cspm4gdumphs73d4rnmg:clnM8Gn9USvXaNQLpqKnJATi6ADtHROX@oregon-redis.render.com:6379")],
+           "hosts": [("127.0.0.1", 6379)],
         },
     },
 }

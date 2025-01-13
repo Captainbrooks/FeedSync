@@ -262,6 +262,7 @@ def messenger(request):
     for f in friends_with:
         friend = f.sender if f.sender != user else f.receiver
         profile = Profile.objects.filter(user=friend).first()
+
         
         
         unread_count = unread_message_count(user, friend)

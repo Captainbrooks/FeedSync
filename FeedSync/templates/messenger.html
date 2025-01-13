@@ -86,14 +86,14 @@
         <div class="friend w-full flex items-center hover:bg-gray-300 p-2 cursor-pointer" 
         data-name="{{ m.name }}" 
         {% if m.image %}
-        data-image="{{ m.image.url }}"
+        data-image="{{ m.image }}"
     {% else %}
         data-image="{% static 'images/noprofile.png' %}"
     {% endif %}
     >
    <!-- Default profile image if none -->
 
-   <img src="{% if m.image %}{{ m.image.url }}{% else %}{% static 'images/noprofile.png' %}{% endif %}" alt="{{ m.name }}" class="rounded-full h-12 w-12 mb-1 object-cover">
+   <img src="{% if m.image %}{{ m.image }}{% else %}{% static 'images/noprofile.png' %}{% endif %}" alt="{{ m.name }}" class="rounded-full h-12 w-12 mb-1 object-cover">
 
           
           <h1 class="ml-4 font-bold" data-name="{{m.name}}">{{ m.name }}</h1>
@@ -168,6 +168,8 @@
 </div>
         
         `
+
+
         
         
         // Closing the socket if exists
@@ -176,12 +178,19 @@
         }
 
         // Opening a new WebSocket connection
-        socket = new WebSocket(`wss://${window.location.host}/ws/messenger/${username}/${friendName}/`);
+        socket = new WebSocket(`wss://www.feedsync.miltongaire.com/ws/messenger/${username}/${friendName}/`);
 
         socket.onopen = function() {
             console.log(`Connected to chat with ${friendName}`);
             
         }
+
+        setInterval(() => {
+            if (socket.readyState === WebSocket.OPEN) {
+                socket.send(JSON.stringify({ type: "keep_alive" }));
+            }
+        }, 30000); // Every 30 seconds
+    
 
         socket.onmessage = function(event) {
             const data = JSON.parse(event.data);
