@@ -334,7 +334,7 @@ def friends(request):
     
     # Process received requests
     for req in receivedRequests:
-        profile = Profile.objects.filter(user=req.sender).first()  # Use .first() to avoid multiple results
+        profile = Profile.objects.filter(user=req.sender).first()  
         if profile:
             received_reqs.append({
                 'sender': profile.user.username,
@@ -343,7 +343,7 @@ def friends(request):
     
     # Process sent requests
     for req in sentRequests:
-        profile = Profile.objects.filter(user=req.receiver).first()  # Use .first() to avoid multiple results
+        profile = Profile.objects.filter(user=req.receiver).first()  
         if profile:
             sent_reqs.append({
                 'receiver': profile.user.username,
@@ -540,16 +540,23 @@ def like_post(request,post_id):
         liked = False
     else:
         liked = True
+        print("liked created")
         
         if user != post_author:
+            print("user is not author")
             
-            Notification.objects.create(
+            new_notification=Notification.objects.create(
                
                 sender=user,
                 profile_picture=profile_picture,
                 receiver=post_author,
                 notification=message
             )
+            
+            print("new notification:" , new_notification)
+            
+            
+            
             
             
             
