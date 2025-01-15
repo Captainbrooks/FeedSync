@@ -400,7 +400,7 @@
 
                             <!-- comment form -->
 
-                            <div class="flex items-start">
+                            <div class="flex w-full gap-x-1">
 
                                 {% if profile_image_url %}
                                 <div class="flex items-center gap-x-2">
@@ -419,20 +419,22 @@
                              
                                 <form
                                 enctype="multipart/form-data"
-                                class="w-full bg-zinc-100 outline-none rounded-b-xl m-2 flex flex-col shadow-md"
+                                class="w-11/12"
                                 id="comment_form">
                                 {% csrf_token %}
+
+                                <div class="flex items-center px-2 py-2 rounded-lg bg-gray-50">
     
-                                <textarea name="comment_text" placeholder="Write a comment" class="comment_text w-full p-2 bg-zinc-100 outline-none rounded-b-xl"
-                                id="comment_{{post.id}}" data-postcomment-id="{{post.id}}"></textarea>
+                                    <textarea name="comment_text" rows="1" placeholder="Write a comment" class="block p-2.5 w-full text-sm text-gray-900 bg-white rounded-lg"
+                                    id="comment_{{ post.id }}" data-postcomment-id="{{ post.id }}"></textarea>
     
-                                <button type="button"
-                              
-                                    class="comment-btn flex justify-end font-bold px-6 py-0.5 text-blue-500 text-xl"
-                                      data-postcomment-id="{{post.id}}">
-    
-                                    <i class="fa-solid fa-right-long" id="icon"></i>
-                                </button>
+                                    <button type="button" class="comment-btn inline-flex justify-center p-2 text-blue-600 rounded-lg" data-postcomment-id="{{ post.id }}">
+                                        <svg class="w-5 h-5 rotate-90 rtl:-rotate-90" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 18 20">
+                                            <path d="m17.914 18.594-8-18a1 1 0 0 0-1.828 0l-8 18a1 1 0 0 0 1.157 1.376L8 18.281V9a1 1 0 0 1 2 0v9.281l6.758 1.689a1 1 0 0 0 1.156-1.376Z"/>
+                                        </svg>
+                                        <span class="sr-only">Send comment</span>
+                                    </button>
+                                </div>
     
                             </form>
                             </div>
@@ -776,10 +778,10 @@ function attachDeleteEvent(button) {
         const postId = this.getAttribute('data-post-id');
         const csrftoken = getCookie('csrftoken');
 
-        const url = `/post/${postId}/${commentId}/delete_comment/`; // Adjust URL based on your routing
+        const url = `/post/${postId}/${commentId}/delete_comment/`;
 
         fetch(url, {
-            method: "POST",
+            method: "DELETE",
             headers: {
                 'Content-Type': 'application/json',
                 'X-CSRFToken': csrftoken

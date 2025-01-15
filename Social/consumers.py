@@ -186,19 +186,6 @@ class Messenger(AsyncJsonWebsocketConsumer):
             for msg in messages
         ]
 
-
-        
-        
-       
-        
-        
-
-
-
-
-
-
-
 class NotificationConsumer(AsyncJsonWebsocketConsumer):
     async def connect(self):
         self.user = self.scope["user"]
@@ -209,31 +196,21 @@ class NotificationConsumer(AsyncJsonWebsocketConsumer):
         self.room_group_name,
         self.channel_name
     )
-        
-
-        
-        
-        
-           
+          
         await self.accept()
-        print(f"connecting with ${self.user.id}")
-
-
-
-
+    
     async def receive(self, text_data):
         
         data = json.loads(text_data)
         
-        if data.get('type') == 'keep_alive':
-            return
+        
 
 
     async def send_notification(self, event):
-        print("reached")
+        
         notification = event["notification"]
         
-        print(f"notification: {notification}")
+        
         profile_picture=event.get("profile_picture","")
         unread_count = event.get("unread_count", 0)
         sender = event.get("sender", "")
