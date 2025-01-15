@@ -1,0 +1,13 @@
+# Python cache files
+__pycache__/
+*.py[cod]
+
+# SQLite database file
+db.sqlite3
+
+# Virtual environment
+venv/
+
+# Logs and temporary files
+*.log
+*.tmp
