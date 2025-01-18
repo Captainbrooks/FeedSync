@@ -842,14 +842,6 @@
 
                     try{
                         if (data.status === 'success') {
-                            Toastify({
-                                text:"Comment added successfully!",
-                                duration: 2000,
-                                gravity: "top",
-                                position: 'center',
-                                backgroundColor: "green",
-                            }).showToast();
-    
                             document.getElementById('comment-sound').play();
                             renderComment(data.comments,postId);
                             document.querySelector(`#comment_${postId}`).value = '';
@@ -975,6 +967,7 @@
                             position: 'center',
                             backgroundColor: "green",
                         }).showToast();
+                        document.getElementById('comment-sound').play();
                     } else{
                         Toastify({
                             text: "Error 404: Resource not found.",

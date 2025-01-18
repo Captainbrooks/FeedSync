@@ -61,10 +61,10 @@
     <h1 class="p-5 font-bold text-gray-600 text-2xl">Chats</h1>
 
     <div class="flex justify-center items-center">
-        <form class="w-1/2 bg-gray-100 rounded-full flex items-center shadow-sm my-1">
-            <input type="search" name="search" placeholder="Search friends"
-                class="flex-grow text-gray-700 bg-gray-100 rounded-l-full border-none focus:outline-none px-4">
-            <button type="submit"
+        <form class="w-full md:w-1/2 bg-gray-100 rounded-full flex items-center shadow-sm my-1" id="search_friend_form">
+            <input type="search" id="messenger_friend_search" name="search" placeholder="Search friends"
+                class="flex-grow text-gray-700 bg-gray-100 rounded-l-full border-none outline-none px-4 focus:ring-0 focus:border-none">
+            <button type="submit" disabled
                 class="px-3 py-3 bg-gray-100 rounded-r-full hover:bg-zinc-200 focus:outline-none focus-within:bg-white">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-600" fill="currentColor" viewBox="0 0 50 50">
                     <path
@@ -76,9 +76,14 @@
     </div>
 
     <hr class="mt-4 border-t border-2 border-gray-300">
+    
+    <!-- Friend Search Div -->
+    <div id="resultsContainer" class="mt-4"></div>
+
+    <!-- Friend Search Div -->
 
     <!-- Friend List Scrollable Section -->
-    <div class="flex-grow overflow-y-auto h-full">
+    <div class="flex-grow overflow-y-auto h-full" id="friends_div">
 
         {% if my_friends %}
         {% for m in my_friends %}
@@ -119,7 +124,7 @@
                     <img id="friend-image" src="" alt="" class="rounded-full h-12 w-12 mb-1 object-cover">
                     <h3 id="textfriend" class="text-lg font-semibold"></h3>
                 </div>
-                <button id="close-chat" class="text-gray-300 hover:text-gray-400">
+                <button id="close-chat" class="text-white">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                     </svg>
@@ -142,6 +147,89 @@
 
 <audio id="new-message" src="{% static 'sound\newmessage.mp3' %}" preload="auto"></audio>
 <audio id="message-sent" src="{% static 'sound\messageSent.mp3' %}" preload="auto"></audio>
+
+
+<script>
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const resultsContainer = document.getElementById("resultsContainer");
+        const friends_div = document.getElementById("friends_div");
+        const search_friend_form = document.getElementById("search_friend_form");
+        const search_input = search_friend_form.querySelector("input[name='search']");
+
+        if (search_input.value.trim() === "") {
+            friends_div.style.display = "block"; // Show friends div
+            resultsContainer.style.display = "none"; // Hide search results
+        } else {
+            friends_div.style.display = "none"; // Hide friends div
+            resultsContainer.style.display = "block"; // Show search results
+        }
+    
+        search_input.addEventListener('input', function () {
+            const searchQuery = search_input.value.trim();
+            const queryParams = new URLSearchParams({ search: searchQuery }).toString();
+    
+            try {
+                fetch(`/search_messenger_friend?${queryParams}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.status === 'error') {
+                            Toastify({
+                                text: data.message,
+                                duration: 3000,
+                                close: true,
+                                gravity: "top",
+                                position: "center",
+                                backgroundColor: "red",
+                                style: {
+                                    color: "white"
+                                },
+                            }).showToast();
+                        } else if (data.status === 'success') {
+                            // Clear previous results before adding new ones
+                            resultsContainer.innerHTML = '';
+    
+                            if (data.results && data.results.length > 0) {
+                                data.results.forEach(friend => {
+                                    const friendElement = document.createElement('div');
+                                    friendElement.classList.add('friend', 'w-full', 'flex', 'items-center', 'hover:bg-gray-300', 'p-2', 'cursor-pointer');
+                                       // Add data-name and data-image as attributes
+                                friendElement.setAttribute('data-name', friend.name);
+                                friendElement.setAttribute('data-image', friend.image ? friend.image : "{% static 'images/noprofile.png' %}");
+                                    friendElement.innerHTML = `
+                                        <img src="${friend.image}" alt="${friend.name}" class="rounded-full h-12 w-12 mb-1 object-cover">
+                                        <h1 class="ml-4 font-bold">${friend.name}</h1>
+                                        <span class="unread-count ml-2 text-sm text-white bg-red-500 rounded-full w-5 h-5 flex items-center justify-center hidden" data-unread-count="0"></span>
+                                    `;
+
+                                    friendElement.addEventListener('click', function () {
+                                        openChat(friend.name, friend.image);
+                                    });
+                                    resultsContainer.appendChild(friendElement);
+                                });
+                            } else {
+                                resultsContainer.innerHTML = '<p class="text-center text-lg font-semibold text-gray-600 py-4 px-6">No friends found</p>';
+                            }
+                            friends_div.style.display = "none";
+                            resultsContainer.style.display = "block";
+                        }
+                    })
+                    .catch(error => console.error('Error during the fetch:', error));
+            } catch (error) {
+                console.error("Error:", error);
+            }
+        });
+    });
+    
+
+
+
+</script>
 
 <script>
     const chatContainer = document.getElementById("chat-container");
@@ -339,17 +427,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
 // getting the unread_count from localStorage to prevent them getting vanish when refresh
 
 window.addEventListener('load', function() {
@@ -398,5 +475,8 @@ document.querySelectorAll('.friend').forEach(friendElement => {
 });
 
 </script>
+
+
+
 
 {% endblock %}

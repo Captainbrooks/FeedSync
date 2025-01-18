@@ -8,7 +8,7 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1  maximum-scale=1, user-scalable=no">
     <title>FeedSync</title>
 
     {% tailwind_css %}
@@ -168,23 +168,35 @@
                 const messagesDiv = document.getElementById('django-messages');
                 if (messagesDiv) {
                     const messages = JSON.parse(messagesDiv.getAttribute('data-messages'));
-
+        
                     messages.forEach(message => {
                         Toastify({
                             text: message.text,
-                            duration: 3000,
-                            gravity: "top",
-                            position: "center",
-                            backgroundColor: message.tag.includes("success") ? "green" : "red",
+                            duration: 4000, // Slightly longer duration
+                            gravity: "top", // Messages appear at the top
+                            position: "center", // Centered horizontally
+                            backgroundColor: message.tag.includes("success") 
+                                ? "linear-gradient(to right, #4caf50, #81c784)" // Green gradient for success
+                                : "linear-gradient(to right, #f44336, #e57373)", // Red gradient for errors
                             style: {
-                                color: "white"
+                                borderRadius: "8px", // Rounded corners
+                                padding: "10px", // Add some padding
+                                fontSize: "16px", // Slightly larger font
+                                boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)", // Subtle shadow
+                                color: "white", // Ensure the text is white
+                                textAlign: "center", // Center the text
                             },
-                            stopOnFocus: true
+                            offset: {
+                                y: 80 // Push down a bit for better visibility
+                            },
+                            close: true, // Add a close button
+                            stopOnFocus: true, // Prevent dismissing on hover
                         }).showToast();
                     });
                 }
             });
         </script>
+        
         <!-- django messages -->
 
 
@@ -615,6 +627,8 @@
         notificationSocket.onmessage = function (e) {
 
             const data = JSON.parse(e.data);
+            console.log(data)
+          
 
           
 

@@ -1149,6 +1149,49 @@ def clear_notification(request):
 
     return redirect(current)
 
+
+
+def search_messenger_friend(request):
+    print("search messenger Friend Reached")
+    
+    user=request.user
+    query=request.GET.get('search', '')
+    lowercase_query = query.lower()
+    
+    
+    
+
+    
+    results=[]
+    
+    all_friends=Friendship.objects.filter(
+        Q(sender=user,) | Q(receiver=user),accepted=True
+        )
+    
+    for f in all_friends:
+        friend = f.sender if f.sender != user else f.receiver
+        lowercase_friendname=friend.username.lower()
+        
+        if lowercase_query in lowercase_friendname:
+           
+            profile = Profile.objects.filter(user=friend).first()
+            results.append({
+            'name': friend.username,
+            'image': base64_to_image(profile.profile_picture) if profile.profile_picture else None
+        })
+        
+            
+
+        
+    
+    
+  
+        
+    
+    return JsonResponse({'status':'success','results':results})
+    
+    
+
     
     
     

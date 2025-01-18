@@ -19,7 +19,6 @@ from django.urls import path, re_path, include
 from FeedSync.views import *
 
 
-
 urlpatterns = [
     
      path('admin/', admin.site.urls),
@@ -52,6 +51,7 @@ urlpatterns = [
     path('logout/',logout_page,name="logout_page"),
     path("deleteprofile/", deleteprofile, name="deleteprofile"),
     path("clear_notification/",clear_notification,name="clear_notification"),
+    path("search_messenger_friend",search_messenger_friend,name="search_messenger_friend"),
     path("__reload__/", include("django_browser_reload.urls")),
 
    
