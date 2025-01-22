@@ -4,14 +4,9 @@
 {% extends "base.html" %}
 
 {% block start %}
+{% load custom_filters %}
 
 {% load static %}
-
-
-
-
-
-
 
 
     <!-- Dashboard sidebar -->
@@ -157,12 +152,7 @@
                     {% endif %}
                 </div>
             </li>
-
-
-
-
-
-
+            
         </ul>
     </div>
 </aside>
@@ -289,8 +279,8 @@
                                     {% if post.created_at %}
 
                                     <input type="text"
-                                        class="time-posted text-sm text-gray-600 ps-2 border-none outline-none w-1/2"
-                                        value='{{ post.created_at|timesince }}' disabled />.
+                                        class="time-posted text-sm text-gray-600 ps-2 border-none outline-none w-1/4"
+                                        value='{{ post.created_at|time_ago}}' disabled />.
 
                                     <i class="fa-duotone fa-solid fa-earth-americas p-0"
                                         style="--fa-primary-color: #898888; --fa-secondary-color: #fffafa;"></i>
@@ -636,7 +626,20 @@
                     </div>
                 </div>
 
+               
+
                 {% endfor %}
+
+                <div class="flex flex-col items-center justify-center bg-white border border-gray-200 rounded-lg p-4 max-w-xs mx-auto shadow-md">
+                    <svg class="w-10 h-10 text-gray-700 mb-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                        <path fill-rule="evenodd" d="M9 3C9 2.44772 9.44772 2 10 2C10.5523 2 11 2.44772 11 3V16.5858L12.7071 14.8787C13.0976 14.4882 13.7308 14.4882 14.1213 14.8787L17.1213 17.8787C17.5118 18.2692 17.5118 18.9024 17.1213 19.2929L14.1213 22.2929C13.7308 22.6834 13.0976 22.6834 12.7071 22.2929L11 20.5858V22C11 22.5523 10.5523 23 10 23C9.44772 23 9 22.5523 9 22V3ZM0 11C0 10.4477 0.447715 10 1 10C1.55228 10 2 10.4477 2 11V19C2 19.5523 1.55228 20 1 20C0.447715 20 0 19.5523 0 19V11Z" clip-rule="evenodd"/>
+                    </svg>
+                    <span class="text-sm text-gray-800 font-medium">You are all caught up</span>
+                </div>
+                
+                
+                
+                
 
                 {% else %}
 
